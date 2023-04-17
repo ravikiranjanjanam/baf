@@ -1,0 +1,50 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: org1-net-ca
+  namespace: org1-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  interval: 1m
+  releaseName: org1-net-ca
+  chart:
+    spec:
+      interval: 1m
+      sourceRef:
+        kind: GitRepository
+        name: flux-bevel-dev-fabric
+        namespace: flux-bevel-dev-fabric
+      chart: platforms/hyperledger-fabric/charts/ca    
+  values:
+    metadata:
+      namespace: org1-net
+      images:
+        alpineutils: adopblockchaincloud0502.azurecr.io/alpine-utils:1.0
+        ca: hyperledger/fabric-ca:1.4.8
+    server:
+      name: ca
+      tlsstatus: true
+      admin: org1-admin
+        
+    storage:
+      storageclassname: org1sc
+      storagesize: 512Mi 
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev.aws.blockchaincloudpoc-develop.com:20002
+      authpath: bevel-dev-fabricorg1-net-auth
+      secretcert: secretsv2/data/crypto/ordererOrganizations/org1-net/ca?ca.org1-net-cert.pem
+      secretkey: secretsv2/data/crypto/ordererOrganizations/org1-net/ca?org1-net-CA.key
+      secretadminpass: secretsv2/data/credentials/org1-net/ca/org1?user
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    service:
+      servicetype: ClusterIP
+      ports:
+        tcp:
+          port: 7054
+    proxy:
+      provider: haproxy
+      type: orderer
+      external_url_suffix: hfbeveldev.dev.aws.blockchaincloudpoc-develop.com
