@@ -222,7 +222,7 @@
 # This task copies the msp cacerts from vault
 - name: Fetch the msp cacerts from vault
   shell: |
-    vault kv get -field=cacerts {{ vault.secret_path | default('secretsv2') }}/crypto/peerOrganizations/{{ component_name }}/users/admin/msp > ca-{{ component_name }}-{{ item.external_url_suffix }}-8443.pem
+    vault kv get -field=cacerts {{ vault.secret_path | default('secretsv2') }}/data/crypto/peerOrganizations/{{ component_name }}/users/admin/msp > ca-{{ component_name }}-{{ item.external_url_suffix }}-8443.pem
     mkdir -p ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/cacerts/
     mv ca-{{ component_name }}-{{ item.external_url_suffix }}-8443.pem ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/cacerts/
   environment:
@@ -234,7 +234,7 @@
 # This task copies the msp tlscacerts from vault
 - name: Fetch the msp tlscacerts from vault
   shell: |
-    vault kv get -field=tlscacerts {{ vault.secret_path | default('secretsv2') }}/crypto/peerOrganizations/{{ component_name }}/users/admin/msp > ca-{{ component_name }}-{{ item.external_url_suffix }}-8443.pem
+    vault kv get -field=tlscacerts {{ vault.secret_path | default('secretsv2') }}/data/crypto/peerOrganizations/{{ component_name }}/users/admin/msp > ca-{{ component_name }}-{{ item.external_url_suffix }}-8443.pem
     mkdir -p ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/tlscacerts/
     mv ca-{{ component_name }}-{{ item.external_url_suffix }}-8443.pem ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/tlscacerts/
   environment:
@@ -246,7 +246,7 @@
 # This task copies the msp cacerts from vault when proxy is none
 - name: Fetch the msp cacerts from vault
   shell: |
-    vault kv get -field=cacerts {{ vault.secret_path | default('secretsv2') }}/crypto/peerOrganizations/{{ component_name }}/users/admin/msp > ca-{{ component_name }}-{{ item.services.ca.grpc.port }}.pem
+    vault kv get -field=cacerts {{ vault.secret_path | default('secretsv2') }}/data/crypto/peerOrganizations/{{ component_name }}/users/admin/msp > ca-{{ component_name }}-{{ item.services.ca.grpc.port }}.pem
     mkdir -p ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/cacerts/
     mv ca-{{ component_name }}-{{ item.services.ca.grpc.port }}.pem ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/cacerts/
   environment:
@@ -258,7 +258,7 @@
 # This task copies the msp tlscacerts from vault when proxy is none
 - name: Fetch the msp tlscacerts from vault
   shell: |
-    vault kv get -field=tlscacerts {{ vault.secret_path | default('secretsv2') }}/crypto/peerOrganizations/{{ component_name }}/users/admin/msp > ca-{{ component_name }}-{{ item.services.ca.grpc.port }}.pem
+    vault kv get -field=tlscacerts {{ vault.secret_path | default('secretsv2') }}/data/crypto/peerOrganizations/{{ component_name }}/users/admin/msp > ca-{{ component_name }}-{{ item.services.ca.grpc.port }}.pem
     mkdir -p ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/tlscacerts/
     mv ca-{{ component_name }}-{{ item.services.ca.grpc.port }}.pem ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/tlscacerts/
   environment:
@@ -270,7 +270,7 @@
 # This task gets msp config.yaml file from vault
 - name: Fetch msp config.yaml file from vault
   shell: |
-    vault kv get -field=configfile {{ vault.secret_path | default('secretsv2') }}/crypto/peerOrganizations/{{ component_name }}/msp/config > config.yaml
+    vault kv get -field=configfile {{ vault.secret_path | default('secretsv2') }}/data/crypto/peerOrganizations/{{ component_name }}/msp/config > config.yaml
     mv config.yaml ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/
   environment:
     VAULT_ADDR: "{{ vault.url }}"
@@ -295,7 +295,7 @@
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/setup"
   vars:
     vault_field: "client.key"
-    vault_path: "{{ vault.secret_path | default('secretsv2') }}/crypto/peerOrganizations/{{ component_name }}/users/{{ user.identity }}/tls"
+    vault_path: "{{ vault.secret_path | default('secretsv2') }}/data/crypto/peerOrganizations/{{ component_name }}/users/{{ user.identity }}/tls"
     check: "crypto_materials"
   loop: "{{ item.users }}"
   loop_control:
