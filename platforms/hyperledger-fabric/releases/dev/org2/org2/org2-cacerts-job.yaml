@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: org2-cacerts-job
+  namespace: org2-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  interval: 1m
+  releaseName: org2-cacerts-job
+  chart:
+    spec:
+      interval: 1m
+      sourceRef:
+        kind: GitRepository
+        name: flux-bevel-dev-fabric
+        namespace: flux-bevel-dev-fabric
+      chart: platforms/hyperledger-fabric/charts/generate_cacerts
+  values:
+    metadata:
+      name: org2
+      component_name: org2-net
+      namespace: org2-net    
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: adopblockchaincloud0502.azurecr.io/alpine-utils:1.0
+
+    vault:
+      role: vault-role
+      address: http://vault.internal.dev.aws.blockchaincloudpoc-develop.com:20002
+      authpath: bevel-dev-fabricorg2-net-auth
+      secretcryptoprefix: secretsv2/data/crypto/peerOrganizations/org2-net/ca
+      secretcredentialsprefix: secretsv2/data/credentials/org2-net/ca/org2
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      
+    ca:
+      subject: /C=GB/ST=London/L=London/O=org2/CN=ca.org2-net.hfbeveldev.dev.aws.blockchaincloudpoc-develop.com
