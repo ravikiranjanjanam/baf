@@ -153,7 +153,7 @@
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/setup"
   vars:
     vault_field: "client.key"
-    vault_path: "{{ vault.secret_path | default('secretsv2') }}/crypto/{{ component_type }}Organizations/{{ component_name }}/users/admin/tls"
+    vault_path: "{{ vault.secret_path | default('secretsv2') }}/data/crypto/{{ component_type }}Organizations/{{ component_name }}/users/admin/tls"
     check: "crypto_materials"
 
 # This task wait for orderers tls exists in vault.
@@ -162,7 +162,7 @@
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/setup"
   vars:
     vault_field: "server.key"
-    vault_path: "{{ vault.secret_path | default('secretsv2') }}/crypto/{{ component_type }}Organizations/{{ component_name }}/peers/{{ peer.name }}.{{ component_name }}/tls"
+    vault_path: "{{ vault.secret_path | default('secretsv2') }}/data/crypto/{{ component_type }}Organizations/{{ component_name }}/peers/{{ peer.name }}.{{ component_name }}/tls"
     check: "crypto_materials"
   loop: "{{ item.services.peers }}"
   loop_control:
@@ -174,7 +174,7 @@
     name: "{{ playbook_dir }}/../../shared/configuration/roles/check/setup"
   vars:
     vault_field: "key"
-    vault_path: "{{ vault.secret_path | default('secretsv2') }}/crypto/{{ component_type }}Organizations/{{ component_name }}/ambassador"
+    vault_path: "{{ vault.secret_path | default('secretsv2') }}/data/crypto/{{ component_type }}Organizations/{{ component_name }}/ambassador"
     check: "crypto_materials"
   loop: "{{ item.services.peers }}"
   loop_control:
@@ -211,7 +211,7 @@
 # This task copies the msp admincerts from vault
 - name: Fetch the msp admincerts from vault
   shell: |
-    vault kv get -field=admincerts {{ vault.secret_path | default('secretsv2') }}/crypto/peerOrganizations/{{ component_name }}/users/admin/msp > Admin@{{ component_name }}-cert.pem
+    vault kv get -field=admincerts {{ vault.secret_path | default('secretsv2') }}/data/crypto/peerOrganizations/{{ component_name }}/users/admin/msp > Admin@{{ component_name }}-cert.pem
     mkdir -p ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/admincerts/
     mv Admin@{{ component_name }}-cert.pem ./build/crypto-config/peerOrganizations/{{ component_name }}/msp/admincerts/
   environment:
