@@ -1,0 +1,86 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: csc0csc0member-node
+  namespace: csc0-bes
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: csc0csc0member-node
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/hyperledger-besu/charts/node_besu
+    sourceRef:
+      kind: GitRepository
+      name: flux-besu-sc0
+      namespace: flux-besu-sc0
+  values:
+    metadata:
+      namespace: csc0-bes
+      labels:
+    replicaCount: 1
+    staticnodes:
+      - "enode://533349d820fb7092a08e3a5d0043bfac78e38826553a5c5a3370a1cf3b8bf6b82f0d161613b9960bc0df6bb4a389661136135ac16c94a8728baca1f4970a8765@validator1.bes.demo.aws.blockchaincloudpoc-develop.com:15011"
+      - "enode://a4e394ba02d9e50d312ee7c69e0e74b5fd62627c5f60c69f7a96cada4778aecccfad6da5c59f8f396c95e0d01f70ac9345283409b8bbdcf0b04d164645ffecf9@validator2.bes.demo.aws.blockchaincloudpoc-develop.com:15013"
+      - "enode://8d683c5dca83d44e3d552c7c9f3453bd3e96d944441310317697c237f260bbc72781b7a20daf47ba2ca5b450dba7497b86b3b8275d7c868005ab9054098c46a0@validator3.bes.demo.aws.blockchaincloudpoc-develop.com:15015"
+      - "enode://08de35c385f4426d735244862da208f5d057eb6502db46bfd4d2af0cab74d547795ea24bbbae4785fcaa9833cd410861e213ae14ca4cc5b5258db49c58755a75@validator4.bes.demo.aws.blockchaincloudpoc-develop.com:15017"
+      - "enode://21d4aca3f4da0bf9dcf74903b06f382ddc746a3ed8996e31cf9fb10364b039d3615ecad22526042ac134bc0103d9048981c5c74d901c5381f7fc606c4c9d122d@csc0.bes.demo.aws.blockchaincloudpoc-develop.com:15019"
+
+    liveliness_check:
+      enabled: false
+    healthcheck:
+      readinessthreshold: 100
+      readinesscheckinterval: 5
+    proxy:
+      provider: ambassador
+      external_url: csc0.bes.demo.aws.blockchaincloudpoc-develop.com
+      p2p: 15019
+      rpc: 15020
+
+    images:
+      node: hyperledger/besu:22.10.2
+      alpineutils: ghcr.io/hyperledger/bevel-alpine:latest
+      pullPolicy: IfNotPresent
+
+    node:
+      name: csc0
+      consensus: ibft
+      subject: O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB
+      mountPath: /opt/besu/data
+      servicetype: ClusterIP
+      imagePullSecret: regcred
+      ports:
+        p2p: 30303
+        rpc: 8545
+        ws: 8546
+
+      permissioning:
+        enabled: False
+
+    tm:
+      type: tessera
+      tls: True
+      url: "https://csc0-tessera.csc0-bes:8888"
+
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+
+    vault:
+      address: http://ad5479b2bb371412d86570caf3140882-424952426.eu-west-1.elb.amazonaws.com:20001
+      secretprefix: secretsv2/data/csc0-bes/crypto/csc0
+      serviceaccountname: vault-auth
+      keyname: data
+      tmdir: tm
+      tlsdir: tls
+      role: vault-role
+      authpath: besucsc0
+
+    genesis: ewogICAiY29uZmlnIjogewogICAgICJjaGFpbklkIjogIDIwMTgsCiAgICAgImNvbnN0YW50aW5vcGxlZml4YmxvY2siOiAwLAogICAgICJjb250cmFjdFNpemVMaW1pdCI6IDIxNDc0ODM2NDcsCiAgICAgImliZnQyIjogewogICAgICAgImJsb2NrcGVyaW9kc2Vjb25kcyI6IDIsCiAgICAgICAiZXBvY2hsZW5ndGgiOiAzMDAwMCwKICAgICAgICJyZXF1ZXN0dGltZW91dHNlY29uZHMiOiAxMAogICAgIH0KICAgfSwKICAgIm5vbmNlIjogIjB4MCIsCiAgICJ0aW1lc3RhbXAiOiAiMHg1OGVlNDBiYSIsCiAgICJnYXNMaW1pdCI6ICIweDFmZmZmZmZmZmZmZmZmIiwKICAgImRpZmZpY3VsdHkiOiAiMHgxIgp9
+
+ 
+
+    metrics:
+      enabled: False
+      port: 9545
