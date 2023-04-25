@@ -1,0 +1,48 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: csc0-ambassador-job
+  namespace: csc0-bes
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: csc0-ambassador-job
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/hyperledger-besu/charts/generate_ambassador_certs
+    sourceRef:
+      kind: GitRepository
+      name: flux-besu-sc0
+      namespace: flux-besu-sc0
+  values:
+    metadata:
+      name: csc0-ambassador-job
+      namespace: csc0-bes
+    image:
+      alpineutils: ghcr.io/hyperledger/bevel-alpine:latest
+      pullSecret: regcred
+      pullPolicy: IfNotPresent
+    network:
+      tmtls: True
+    node:
+      name: csc0
+      clientport: 8888
+    vault:
+      address: http://ad5479b2bb371412d86570caf3140882-424952426.eu-west-1.elb.amazonaws.com:20001
+      secretengine: secretsv2
+      authpath: besucsc0
+      rootcasecret: secretsv2/data/csc0-bes/crypto/ambassadorcerts/rootca
+      ambassadortlssecret: secretsv2/data/csc0-bes/crypto/csc0/tls
+      role: vault-role
+      serviceaccountname: vault-auth
+    subject:
+      ambassadortls: CN=DLT Root CA/OU=DLT/O=DLT/L=London/C=GB
+    opensslVars:
+      domain_name_pub: csc0.bes.demo.aws.blockchaincloudpoc-develop.com
+      domain_name_priv: csc0.csc0-bes
+      domain_name_tessera: csc0-tessera.csc0-bes
+    healthcheck:
+      retries: 10
+      sleepTimeAfterError: 2
+
