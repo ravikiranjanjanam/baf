@@ -98,5 +98,4 @@ ENV PATH=/home/jdk-14/bin:$PATH
 #path to mount the repo
 VOLUME /home/bevel/
 
-
 CMD ["/home/run.sh"]
