@@ -6,7 +6,7 @@
 
 # USAGE: 
 # docker build . -t bevel-build
-# docker run -v $(pwd):/home/bevel/ bevel-build
+# docker run --network host -i -t bevel-build /bin/bash
 
 FROM ubuntu:20.04
 
@@ -49,6 +49,37 @@ RUN apt-get update && apt-get install -y python3-venv
 RUN rm /etc/apt/apt.conf.d/docker-clean
 RUN mkdir /etc/ansible/
 RUN /bin/echo -e "[ansible_provisioners:children]\nlocal\n[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
+
+#Install aws cli Binary
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+          unzip awscliv2.zip && \
+          ./aws/install && \
+          rm -r awscliv2.zip
+
+#Install eksctl Binary
+ENV ARCH=amd64
+ENV PLATFORM=Linux_$ARCH
+RUN curl -sLO "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz" && \
+    tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && \
+    rm eksctl_$PLATFORM.tar.gz && \
+    mv /tmp/eksctl /usr/local/bin
+
+#Install kubectl Binary
+RUN curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.22.17/2023-03-17/bin/linux/amd64/kubectl && \
+    chmod +x ./kubectl && \
+    mv kubectl /usr/local/bin/
+
+#Install helm Binary
+RUN curl -O https://get.helm.sh/helm-v3.6.2-linux-amd64.tar.gz && \
+    tar -zxvf helm-v3.6.2-linux-amd64.tar.gz && \
+    mv linux-amd64/helm /usr/local/bin/helm
+
+#Install git
+RUN apt-get update && \
+    apt-get install git-all -y
+
+RUN apt-get update && \
+    apt-get install vim -y
 
 # Copy the provisional script to build container
 COPY ./run.sh /home
