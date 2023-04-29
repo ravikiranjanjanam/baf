@@ -11,6 +11,7 @@
 name: Test Ansible using Molecule
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [ develop ]
     types: [opened, edited, synchronize, reopened]
