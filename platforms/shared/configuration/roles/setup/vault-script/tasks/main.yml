@@ -6,7 +6,7 @@
     kind: ConfigMap
     namespace: "{{ component_ns }}"
     name: bevel-vault-script
-  register: bevel-vault-script
+  register: bevel_vault_script
 
 - name: "Create configmap for bevel-vault-script"
   helm:
@@ -15,3 +15,4 @@
     create_namespace: true
     values: 
       namespace: "{{ component_ns }}"
+  when: bevel_vault_script.resources | length <= 0 
