@@ -86,7 +86,7 @@ spec:
           mkdir -p ${OUTPUT_PATH}
 
 
-          vault_secret_key=${VAULT_SECRET_ROOTCA}
+         
           echo "Checking certs in ${vault_secret_key}"
           vault_secret_key=${VAULT_SECRET_ROOTCA}
           vaultBevelFunc "readJson" "${vault_secret_key}"
@@ -120,7 +120,7 @@ spec:
             echo "Certficates absent in vault. Ignore error warning"
             touch ${OUTPUT_PATH}/ambassadortls_absent.txt
           else
-            validateVaultResponse "${vault_secret_key}" "${LOOKUP_SECRET_RESPONSE}" "LOOKUPSECRETRESPONSE"
+            validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE"
             echo "Certificates present in vault"
             touch ${OUTPUT_PATH}/ambassadortls_present.txt
           fi
@@ -365,7 +365,6 @@ spec:
                 if [ "$TM_TLS_ENABLED" == "true" ]
                 then
                   # Check tls certificates when tm_tls is true
-                  vault_secret_key=${VAULT_SECRET_AMBASSADORTLS}
                   vault_secret_key=${VAULT_SECRET_AMBASSADORTLS}
                   vaultBevelFunc "readJson" ${vault_secret_key}
                   CA_PEM=$(echo ${VAULT_SECRET} | jq -r '.data.data["rootca_pem"]' 2>&1)

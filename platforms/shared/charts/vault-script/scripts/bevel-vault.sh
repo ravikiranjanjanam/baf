@@ -45,7 +45,7 @@ function readHashicorpVaultSecret {
 }
 
 function writeHashicorpVaultSecret {
-    secret_path=$VAULT_SECRET_PATH/data/$1
+    #secret_path=$VAULT_SECRET_PATH/data/$1
     VAULT_RESPONSE=$(curl \
                   -H "X-Vault-Token: ${VAULT_TOKEN}" \
                   -H "Content-Type: application/json" \
