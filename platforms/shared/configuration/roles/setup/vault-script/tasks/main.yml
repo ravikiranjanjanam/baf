@@ -12,6 +12,7 @@
   kubernetes.core.helm:
     name: bevel-vault-script
     chart_ref: "{{ playbook_dir }}/../../shared/charts/vault-script"
+    release_namespace: "{{ component_ns }}"
     create_namespace: true
     values: 
       namespace: "{{ component_ns }}"
