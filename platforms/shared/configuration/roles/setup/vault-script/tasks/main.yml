@@ -9,7 +9,7 @@
   register: bevel_vault_script
 
 - name: "Create configmap for bevel-vault-script"
-  helm:
+  kubernetes.core.helm:
     name: bevel-vault-script
     chart_ref: "{{ playbook_dir }}/../../shared/charts/vault-script"
     create_namespace: true
