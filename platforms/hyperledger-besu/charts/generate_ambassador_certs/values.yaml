@@ -40,6 +40,8 @@ node:
 vault:
   #Provide the vault server address
   #Eg. address: http://54.226.163.39:8200
+  type: 
+  
   address:
 
   #Provide the key path for vault

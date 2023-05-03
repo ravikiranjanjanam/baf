@@ -30,6 +30,7 @@ spec:
       serviceaccountname: vault-auth
       tmprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ component_ns }}/crypto/{{ peer.name }}/tm
       retries: 30
+      type: {{ vault.type | default("hashicorp") }}
     sleepTimeAfterError: 60
     sleepTime: 10
     healthcheck:

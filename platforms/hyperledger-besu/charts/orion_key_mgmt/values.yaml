@@ -32,6 +32,9 @@ vault:
   #Eg. address: http://54.226.163.39:8200
   address:
 
+  #provide the vault type like hashicorp,aws,azure
+  type: 
+  
   #Provide the key path for vault
   #Eg. authpath: provider.stewards
   authpath:

@@ -33,6 +33,7 @@ spec:
       secret_path: {{ vault.secret_path | default(name)}}
       serviceaccountname: vault-auth
       imagesecretname: regcred
+      type: {{ vault.type | default("hashicorp") }}
 
     k8s:
       kubernetes_url: {{ kubernetes_url }}

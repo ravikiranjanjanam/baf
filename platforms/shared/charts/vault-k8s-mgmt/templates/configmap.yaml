@@ -18,3 +18,11 @@ metadata:
     {{- include "labels.custom" . | nindent 2 }}
 data:
   policies-config.json: {{ .Values.vault.policydata | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bevel-vault-script
+  namespace: {{ .Values.metadata.namespace }}
+data:
+{{ (.Files.Glob "scripts/bevel-vault.sh").AsConfig | indent 2 }}

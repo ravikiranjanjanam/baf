@@ -36,6 +36,7 @@ spec:
       ambassadortlssecret: {{ vault.secret_path | default('secretsv2') }}/data/{{ component_ns }}/crypto/{{ node_name }}/tls
       role: vault-role
       serviceaccountname: vault-auth
+      type: {{ vault.type | default("hashicorp") }}
     subject:
       ambassadortls: {{ cert_subject }}
     opensslVars:

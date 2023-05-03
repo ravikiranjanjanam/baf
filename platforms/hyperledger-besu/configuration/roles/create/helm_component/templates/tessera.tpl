@@ -80,6 +80,7 @@ spec:
       tm_keyname: tm
       tlsdir: tls
       role: vault-role
+      type: {{ vault.type | default("hashicorp") }}
       authpath: besu{{ org.name | lower }}
 {% if network.env.proxy == 'ambassador' %}
     proxy:
