@@ -47,6 +47,10 @@ spec:
         - name: vault-token
           emptyDir:
             medium: Memory
+        - name: scripts-volume
+          configMap:
+            name: bevel-vault-script
+            defaultMode: 0777
       initContainers:
        - name: "fetch-vault-token"
          image: "{{ $.Values.image.alpineutils }}"

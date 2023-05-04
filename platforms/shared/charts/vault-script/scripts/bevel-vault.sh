@@ -51,7 +51,7 @@ function writeHashicorpVaultSecret {
                   -H "Content-Type: application/json" \
                   -X POST \
                   -d @${2} \
-                  ${VAULT_ADDR}/v1/${secret_path})
+                  ${VAULT_ADDR}/v1/${1})
 }
 
 ##############################################################################################################################

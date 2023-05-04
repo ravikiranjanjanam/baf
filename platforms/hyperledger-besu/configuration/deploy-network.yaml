@@ -57,24 +57,24 @@
     loop_control:
       loop_var: organizationItem
     
-  # Setup Vault-Kubernetes accesses and Regcred for docker registry
-  - name: "Setup vault"
-    include_role:
-      name: "{{ playbook_dir }}/../../shared/configuration/roles/setup/vault_kubernetes"
-    vars:
-      policy_type: "besu"
-      name: "{{ organizationItem.name | lower }}"
-      component_ns: "{{ organizationItem.name | lower }}-bes"
-      component_name: "{{ organizationItem.name | lower }}-vaultk8s-job"
-      component_auth: "besu{{ organizationItem.name | lower }}"
-      component_type: "organization"
-      kubernetes: "{{ organizationItem.k8s }}"
-      vault: "{{ organizationItem.vault }}"
-      gitops: "{{ organizationItem.gitops }}"
-      reset_path: "platforms/hyperledger-besu/configuration"
-    loop: "{{ network['organizations'] }}"
-    loop_control:
-      loop_var: organizationItem
+  # # Setup Vault-Kubernetes accesses and Regcred for docker registry
+  # - name: "Setup vault"
+  #   include_role:
+  #     name: "{{ playbook_dir }}/../../shared/configuration/roles/setup/vault_kubernetes"
+  #   vars:
+  #     policy_type: "besu"
+  #     name: "{{ organizationItem.name | lower }}"
+  #     component_ns: "{{ organizationItem.name | lower }}-bes"
+  #     component_name: "{{ organizationItem.name | lower }}-vaultk8s-job"
+  #     component_auth: "besu{{ organizationItem.name | lower }}"
+  #     component_type: "organization"
+  #     kubernetes: "{{ organizationItem.k8s }}"
+  #     vault: "{{ organizationItem.vault }}"
+  #     gitops: "{{ organizationItem.gitops }}"
+  #     reset_path: "platforms/hyperledger-besu/configuration"
+  #   loop: "{{ network['organizations'] }}"
+  #   loop_control:
+  #     loop_var: organizationItem
 
   # Generate Ambassador certificate for nodes. These certificates are used for Orion TLS as well
   - name: "Create ambassador certificates for Nodes"
@@ -96,167 +96,167 @@
     loop_control:
       loop_var: organizationItem
 
-  # # This role generates the genesis.json and nodekey/enode for all orgs of the network
-  # - name: "Generate crypto for the IBFT network"
-  #   include_role:
-  #     name: create/crypto/ibft
-  #   vars:
-  #     build_path: "{{ playbook_dir }}/build"
-  #   when: network.config.consensus == 'ibft'
+  # This role generates the genesis.json and nodekey/enode for all orgs of the network
+  - name: "Generate crypto for the IBFT network"
+    include_role:
+      name: create/crypto/ibft
+    vars:
+      build_path: "{{ playbook_dir }}/build"
+    when: network.config.consensus == 'ibft'
   
-  # # This role generates the genesis.json and nodekey/enode for all orgs of the network
-  # - name: "Generate crypto for the QBFT network"
-  #   include_role:
-  #     name: create/crypto/qbft
-  #   vars:
-  #     build_path: "{{ playbook_dir }}/build"
-  #   when: network.config.consensus == 'qbft'
+  # This role generates the genesis.json and nodekey/enode for all orgs of the network
+  - name: "Generate crypto for the QBFT network"
+    include_role:
+      name: create/crypto/qbft
+    vars:
+      build_path: "{{ playbook_dir }}/build"
+    when: network.config.consensus == 'qbft'
 
-  # # This role generates the genesis.json and nodekey/enode for all orgs of the network
-  # - name: "Generate crypto for the CLIQUE network"
-  #   include_role:
-  #     name: create/crypto/clique
-  #   vars:
-  #     build_path: "{{ playbook_dir }}/build"
-  #   when: network.config.consensus == 'clique'
+  # This role generates the genesis.json and nodekey/enode for all orgs of the network
+  - name: "Generate crypto for the CLIQUE network"
+    include_role:
+      name: create/crypto/clique
+    vars:
+      build_path: "{{ playbook_dir }}/build"
+    when: network.config.consensus == 'clique'
 
-  # # This role generates the genesis.json and nodekey/enode for all orgs of the network
-  # - name: "Generate crypto for the ETHASH network"
-  #   include_role:
-  #     name: create/crypto/ethash
-  #   vars:
-  #     build_path: "{{ playbook_dir }}/build"
-  #   when: network.config.consensus == 'ethash'
+  # This role generates the genesis.json and nodekey/enode for all orgs of the network
+  - name: "Generate crypto for the ETHASH network"
+    include_role:
+      name: create/crypto/ethash
+    vars:
+      build_path: "{{ playbook_dir }}/build"
+    when: network.config.consensus == 'ethash'
 
-  # # This role generates the genesis.json
-  # - name: "Generate genesis file"
-  #   include_role:
-  #      name: create/genesis/{{network.config.consensus}}    
-  #   vars:
-  #     build_path: "./build"
+  # This role generates the genesis.json
+  - name: "Generate genesis file"
+    include_role:
+       name: create/genesis/{{network.config.consensus}}    
+    vars:
+      build_path: "./build"
 
-  # # This role deploy validator nodes. Validator nodes do not use Orion crypto.
-  # - name: "Deploy validator nodes"
-  #   include_role:
-  #     name: create/validator
-  #   vars:
-  #     build_path: "./build"
-  #     kubernetes: "{{ item.k8s }}"
-  #     consensus: "{{ network.config.consensus }}"
-  #     component_ns: "{{ item.name | lower }}-bes"
-  #     name: "{{ item.name | lower }}"
-  #     peers: "{{ item.services.validators}}"
-  #     storageclass_name: "{{ item.cloud_provider }}storageclass"
-  #     external_url: "{{ item.external_url_suffix }}"
-  #     vault: "{{ item.vault }}"
-  #     git_url: "{{ item.gitops.git_url }}"
-  #     git_branch: "{{ item.gitops.branch }}"
-  #     docker_url: "{{ network.docker.url }}"
-  #     charts_dir: "{{ item.gitops.chart_source }}"
-  #     values_dir: "{{playbook_dir}}/../../../{{item.gitops.release_dir}}/{{ item.name | lower }}"
-  #   loop: "{{ network['organizations'] }}"
-  #   when:
-  #   - network.config.consensus == 'ibft' or network.config.consensus == 'qbft' or network.config.consensus == 'clique'
-  #   - item.type == 'validator'
+  # This role deploy validator nodes. Validator nodes do not use Orion crypto.
+  - name: "Deploy validator nodes"
+    include_role:
+      name: create/validator
+    vars:
+      build_path: "./build"
+      kubernetes: "{{ item.k8s }}"
+      consensus: "{{ network.config.consensus }}"
+      component_ns: "{{ item.name | lower }}-bes"
+      name: "{{ item.name | lower }}"
+      peers: "{{ item.services.validators}}"
+      storageclass_name: "{{ item.cloud_provider }}storageclass"
+      external_url: "{{ item.external_url_suffix }}"
+      vault: "{{ item.vault }}"
+      git_url: "{{ item.gitops.git_url }}"
+      git_branch: "{{ item.gitops.branch }}"
+      docker_url: "{{ network.docker.url }}"
+      charts_dir: "{{ item.gitops.chart_source }}"
+      values_dir: "{{playbook_dir}}/../../../{{item.gitops.release_dir}}/{{ item.name | lower }}"
+    loop: "{{ network['organizations'] }}"
+    when:
+    - network.config.consensus == 'ibft' or network.config.consensus == 'qbft' or network.config.consensus == 'clique'
+    - item.type == 'validator'
 
-  # # This role generates the crypto materials for orion tm
-  # - name: "Generate crypto for the Orion transaction manager"
-  #   include_role:
-  #     name: create/crypto/orion
-  #   vars:
-  #     build_path: "{{ playbook_dir }}/build"
-  #     component_ns: "{{ org.name }}-bes"
-  #     kubernetes: "{{ org.k8s }}"
-  #     vault: "{{ org.vault }}"
-  #     gitops: "{{ org.gitops }}"
-  #     charts_dir: "{{ org.gitops.chart_source }}"
-  #     values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
-  #   loop: "{{ network['organizations'] }}"
-  #   loop_control:
-  #     loop_var: org
-  #   when:
-  #     - org.type == 'member'
-  #     - network.config.transaction_manager == 'orion'
+  # This role generates the crypto materials for orion tm
+  - name: "Generate crypto for the Orion transaction manager"
+    include_role:
+      name: create/crypto/orion
+    vars:
+      build_path: "{{ playbook_dir }}/build"
+      component_ns: "{{ org.name }}-bes"
+      kubernetes: "{{ org.k8s }}"
+      vault: "{{ org.vault }}"
+      gitops: "{{ org.gitops }}"
+      charts_dir: "{{ org.gitops.chart_source }}"
+      values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
+    loop: "{{ network['organizations'] }}"
+    loop_control:
+      loop_var: org
+    when:
+      - org.type == 'member'
+      - network.config.transaction_manager == 'orion'
 
-  # # This role generates the crypto materials for tessera tm
-  # - name: "Generate crypto for the Tessera transaction manager"
-  #   include_role:
-  #     name: create/crypto/tessera
-  #   vars:
-  #     build_path: "{{ playbook_dir }}/build"
-  #     component_ns: "{{ org.name }}-bes"
-  #     kubernetes: "{{ org.k8s }}"
-  #     vault: "{{ org.vault }}"
-  #     gitops: "{{ org.gitops }}"
-  #     charts_dir: "{{ org.gitops.chart_source }}"
-  #     values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
-  #   loop: "{{ network['organizations'] }}"
-  #   loop_control:
-  #     loop_var: org
-  #   when:
-  #     - org.type == 'member'
-  #     - network.config.transaction_manager == 'tessera'
+  # This role generates the crypto materials for tessera tm
+  - name: "Generate crypto for the Tessera transaction manager"
+    include_role:
+      name: create/crypto/tessera
+    vars:
+      build_path: "{{ playbook_dir }}/build"
+      component_ns: "{{ org.name }}-bes"
+      kubernetes: "{{ org.k8s }}"
+      vault: "{{ org.vault }}"
+      gitops: "{{ org.gitops }}"
+      charts_dir: "{{ org.gitops.chart_source }}"
+      values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
+    loop: "{{ network['organizations'] }}"
+    loop_control:
+      loop_var: org
+    when:
+      - org.type == 'member'
+      - network.config.transaction_manager == 'tessera'
 
-  # # This role generates the admin ppk for permissioning
-  # - name: Generate admin key for permissioning
-  #   include_role:
-  #     name: create/crypto/key_generation
-  #   vars:
-  #     build_path: "{{ playbook_dir }}/build"
-  #     component_ns: "{{ org.name | lower }}-bes"
-  #     vault: "{{ org.vault }}"
-  #     user: "admin"
-  #   loop: "{{ network['organizations'] }}"
-  #   loop_control:
-  #       loop_var: org
-  #   when: network.permissioning.enabled is defined and network.permissioning.enabled == true
+  # This role generates the admin ppk for permissioning
+  - name: Generate admin key for permissioning
+    include_role:
+      name: create/crypto/key_generation
+    vars:
+      build_path: "{{ playbook_dir }}/build"
+      component_ns: "{{ org.name | lower }}-bes"
+      vault: "{{ org.vault }}"
+      user: "admin"
+    loop: "{{ network['organizations'] }}"
+    loop_control:
+        loop_var: org
+    when: network.permissioning.enabled is defined and network.permissioning.enabled == true
 
-  # # This role deploys  Tessera nodes
-  # - name: "Deploy Tessera nodes"
-  #   include_role:
-  #     name: create/tessera
-  #   vars:
-  #     build_path: "{{ playbook_dir }}/build"
-  #     component_ns: "{{ org.name }}-bes"
-  #     storageclass_name: "{{ org.cloud_provider }}storageclass"
-  #     external_url: "{{ org.external_url_suffix }}"
-  #     kubernetes: "{{ org.k8s }}"
-  #     vault: "{{ org.vault }}"
-  #     gitops: "{{ org.gitops }}"
-  #     charts_dir: "{{ org.gitops.chart_source }}"
-  #     values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
-  #   loop: "{{ network['organizations'] }}"
-  #   loop_control:
-  #     loop_var: org
-  #   when:
-  #     - org.type == 'member'
-  #     - network.config.transaction_manager == 'tessera'
+  # This role deploys  Tessera nodes
+  - name: "Deploy Tessera nodes"
+    include_role:
+      name: create/tessera
+    vars:
+      build_path: "{{ playbook_dir }}/build"
+      component_ns: "{{ org.name }}-bes"
+      storageclass_name: "{{ org.cloud_provider }}storageclass"
+      external_url: "{{ org.external_url_suffix }}"
+      kubernetes: "{{ org.k8s }}"
+      vault: "{{ org.vault }}"
+      gitops: "{{ org.gitops }}"
+      charts_dir: "{{ org.gitops.chart_source }}"
+      values_dir: "{{ playbook_dir }}/../../../{{ org.gitops.release_dir }}"
+    loop: "{{ network['organizations'] }}"
+    loop_control:
+      loop_var: org
+    when:
+      - org.type == 'member'
+      - network.config.transaction_manager == 'tessera'
 
-  # # This role deploy nodes with for IBFT consensus
-  # - name: "Deploy Besu nodes for IBFT consensus"
-  #   include_role:
-  #     name: create/member_node
-  #   vars:
-  #     build_path: "./build"
-  #     kubernetes: "{{ item.k8s }}"
-  #     consensus: "{{ network.config.consensus }}"
-  #     component_ns: "{{ item.name | lower }}-bes"
-  #     name: "{{ item.name | lower }}"
-  #     peers: "{{ item.services.peers }}"
-  #     storageclass_name: "{{ item.cloud_provider }}storageclass"
-  #     external_url: "{{ item.external_url_suffix }}"
-  #     vault: "{{ item.vault }}"
-  #     git_url: "{{ item.gitops.git_url }}"
-  #     git_branch: "{{ item.gitops.branch }}"
-  #     docker_url: "{{ network.docker.url }}"
-  #     charts_dir: "{{ item.gitops.chart_source }}"
-  #     values_dir: "{{playbook_dir}}/../../../{{item.gitops.release_dir}}"
-  #   loop: "{{ network['organizations'] }}"
-  #   when:
-  #     - item.type == 'member'
+  # This role deploy nodes with for IBFT consensus
+  - name: "Deploy Besu nodes for IBFT consensus"
+    include_role:
+      name: create/member_node
+    vars:
+      build_path: "./build"
+      kubernetes: "{{ item.k8s }}"
+      consensus: "{{ network.config.consensus }}"
+      component_ns: "{{ item.name | lower }}-bes"
+      name: "{{ item.name | lower }}"
+      peers: "{{ item.services.peers }}"
+      storageclass_name: "{{ item.cloud_provider }}storageclass"
+      external_url: "{{ item.external_url_suffix }}"
+      vault: "{{ item.vault }}"
+      git_url: "{{ item.gitops.git_url }}"
+      git_branch: "{{ item.gitops.branch }}"
+      docker_url: "{{ network.docker.url }}"
+      charts_dir: "{{ item.gitops.chart_source }}"
+      values_dir: "{{playbook_dir}}/../../../{{item.gitops.release_dir}}"
+    loop: "{{ network['organizations'] }}"
+    when:
+      - item.type == 'member'
 
-  # vars: #These variables can be overriden from the command line
-  #   install_os: "linux"                 #Default to linux OS
-  #   install_arch:  "amd64"              #Default to amd64 architecture
-  #   bin_install_dir:  "~/bin"            #Default to /bin install directory for binaries
-  #   add_new_org: false
+  vars: #These variables can be overriden from the command line
+    install_os: "linux"                 #Default to linux OS
+    install_arch:  "amd64"              #Default to amd64 architecture
+    bin_install_dir:  "~/bin"            #Default to /bin install directory for binaries
+    add_new_org: false
