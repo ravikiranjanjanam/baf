@@ -274,7 +274,7 @@ spec:
             source /scripts/bevel-vault.sh
 
             vaultBevelFunc init
-            validateVaultResponse 'vault login token' "${VAULT_TOKEN}"
+            validateVaultResponseHashicorp 'vault login token' "${VAULT_TOKEN}"
 
             while ! [ -f ${MOUNT_PATH}/flag_finish.txt ]
             do
