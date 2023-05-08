@@ -275,7 +275,6 @@ spec:
 
             vaultBevelFunc init
             validateVaultResponseHashicorp 'vault login token' "${VAULT_TOKEN}"
-
             while ! [ -f ${MOUNT_PATH}/flag_finish.txt ]
             do
               echo 'Waiting for generation of certificates'
