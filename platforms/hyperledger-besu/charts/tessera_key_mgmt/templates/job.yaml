@@ -48,6 +48,10 @@ spec:
         - name: vault-token
           emptyDir:
             medium: Memory
+        - name: scripts-volume
+          configMap:
+            name: bevel-vault-script
+            defaultMode: 0777
       initContainers:
        - name: "fetch-vault-token"
          image: "{{ $.Values.image.alpineutils }}"
@@ -66,6 +70,8 @@ spec:
             value: {{ $.Values.vault.role }}
           - name: VAULT_SECRET_PREFIX
             value: "{{ $.Values.vault.tmprefix }}"
+          - name: VAULT_TYPE
+            value: "{{ $.Values.vault.type }}"
          command: ["sh", "-c"]
          args:
             - |-
@@ -104,6 +110,9 @@ spec:
          volumeMounts:
          - name: vault-token
            mountPath: /secret
+         - name: scripts-volume
+           mountPath: /scripts/bevel-vault.sh
+           subPath: bevel-vault.sh
       containers:
         - name:  "tessera-crypto"
           image: "{{ $.Values.image.repository }}"

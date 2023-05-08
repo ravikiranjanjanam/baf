@@ -34,6 +34,7 @@ spec:
       keyprefix: {{ component_ns }}/crypto
       serviceaccountname: vault-auth
       tmprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ component_ns }}/crypto
+      type: {{ vault.type | default("hashicorp") }}
 
 {% if network.env.labels is defined %}
     labels:

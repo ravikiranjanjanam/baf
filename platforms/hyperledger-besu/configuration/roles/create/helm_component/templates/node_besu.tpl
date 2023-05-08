@@ -97,6 +97,7 @@ spec:
       tmdir: tm
       tlsdir: tls
       role: vault-role
+      type: {{ vault.type | default("hashicorp") }}
       authpath: besu{{ name }}
 
     genesis: {{ genesis }}

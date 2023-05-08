@@ -49,6 +49,10 @@ spec:
       - name: certificates
         emptyDir:
           medium: Memory
+      - name: scripts-volume
+        configMap:
+          name: bevel-vault-script
+          defaultMode: 0777
       initContainers:
       - name: init-check-certificates
         image: "{{ $.Values.image.alpineutils }}"
@@ -68,6 +72,8 @@ spec:
           value: {{ $.Values.vault.role }}
         - name: NODE_NAME
           value: {{ $.Values.node.name }}
+        - name: VAULT_TYPE
+          value: "{{ $.Values.vault.type }}"
         - name: MOUNT_PATH
           value: "/certificates"
         command: ["sh", "-c"]
@@ -147,6 +153,9 @@ spec:
         volumeMounts:
           - name: certificates
             mountPath: /certificates
+          - name: scripts-volume
+            mountPath: /scripts/bevel-vault.sh
+            subPath: bevel-vault.sh
       containers:
       - name:  "generate-certs"
         image: "{{ $.Values.image.alpineutils }}"
@@ -270,6 +279,8 @@ spec:
           value: {{ $.Values.node.name }}
         - name: TM_TLS_ENABLED
           value: "{{ $.Values.network.tmtls }}"
+        - name: VAULT_TYPE
+          value: "{{ $.Values.vault.type }}"
         - name: MOUNT_PATH
           value: "/certificates"
         command: ["sh", "-c"]
@@ -507,3 +518,6 @@ spec:
         volumeMounts:
           - name: certificates
             mountPath: /certificates
+          - name: scripts-volume
+            mountPath: /scripts/bevel-vault.sh
+            subPath: bevel-vault.sh

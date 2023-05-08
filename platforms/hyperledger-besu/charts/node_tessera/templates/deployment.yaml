@@ -80,6 +80,10 @@ spec:
             items:
               - key: tessera-config.json.tmpl
                 path: tessera-config.json.tmpl
+        - name: scripts-volume
+          configMap:
+            name: bevel-vault-script
+            defaultMode: 0777
       initContainers:
       - name: certificates-init
         image: {{ .Values.images.alpineutils }}
@@ -93,6 +97,8 @@ spec:
           value: {{ .Values.vault.authpath }}
         - name: VAULT_APP_ROLE
           value: {{ .Values.vault.role }}
+        - name: VAULT_TYPE
+          value: "{{ $.Values.vault.type }}"
         - name: MOUNT_PATH
           value: "/secret"
         command: ["sh", "-c"]
@@ -193,6 +199,9 @@ spec:
           mountPath: /secret
         - name: mysql-jar
           mountPath: /mysql-jar
+        - name: scripts-volume
+          mountPath: /scripts/bevel-vault.sh
+          subPath: bevel-vault.sh
       - name: mysql-init
         image: {{ .Values.images.busybox }}
         imagePullPolicy: IfNotPresent
