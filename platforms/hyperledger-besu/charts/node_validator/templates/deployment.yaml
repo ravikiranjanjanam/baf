@@ -116,7 +116,7 @@ spec:
           vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
           vaultBevelFunc 'readJson' ${vault_secret_key}
 
-          validateVaultResponseHashicorp "secret (${vault_secret_key})" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
+          validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
           nodekey=$(echo ${VAULT_SECRET} | jq -r '.data["key"]') 
           echo "${nodekey}" > ${MOUNT_PATH}/nodekey
 
@@ -125,7 +125,7 @@ spec:
             vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}"
             vaultBevelFunc 'readJson' ${vault_secret_key}
 
-            validateVaultResponseHashicorp "secret (${vault_secret_key})" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE"
+            validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE"
             keystore=$(echo ${VAULT_SECRET} | jq -r '.data["keystore"]')  
             keystore_password=$(echo ${VAULT_SECRET} | jq -r '.data["password"]' | base64 -d)
             echo "${keystore}" > ${MOUNT_PATH}/keystore

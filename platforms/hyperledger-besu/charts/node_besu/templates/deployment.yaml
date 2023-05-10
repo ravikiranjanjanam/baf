@@ -115,7 +115,7 @@ spec:
           vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
           echo "Getting node private key from $vault_secret_key" 
           vaultBevelFunc 'readJson' ${vault_secret_key}
-          validateVaultResponseHashicorp "secret (${vault_secret_key})" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
+          validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
           node_private_key=$(echo ${VAULT_SECRET} | jq -r '.data["key"]') 
           echo "${node_private_key}" > ${MOUNT_PATH}/node_private_key
 
@@ -124,7 +124,7 @@ spec:
             vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tmdir }}" 
             echo "Getting transaction manager public key from $vault_secret_key"
             vaultBevelFunc 'readJson' ${vault_secret_key}
-            validateVaultResponseHashicorp "secret (${vault_secret_key})" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
+            validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
             tm_key_pub=$(echo ${VAULT_SECRET} | jq -r '.data["publicKey"]')    
             echo "${tm_key_pub}" > ${MOUNT_PATH}/tm_key_pub
           fi
@@ -134,7 +134,7 @@ spec:
             vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}" 
             echo "Getting tls knownServer, keystore and keystore password from $vault_secret_key"
             vaultBevelFunc 'readJson' ${vault_secret_key}
-            validateVaultResponseHashicorp "secret (${vault_secret_key})" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
+            validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
             
             tm_known_server=$(echo ${VAULT_SECRET} | jq -r '.data["knownServer"]'| base64 -d) 
             keystore_b64=$(echo ${VAULT_SECRET} | jq -r '.data["keystore"]')  

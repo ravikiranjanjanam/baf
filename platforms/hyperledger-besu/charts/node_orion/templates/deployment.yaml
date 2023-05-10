@@ -120,13 +120,13 @@ spec:
 
           vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
           vaultBevelFunc 'readJson' ${vault_secret_key}
-          validateVaultResponseHashicorp "secret (${vault_secret_key})" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
+          validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
           nodekey=$(echo ${VAULT_SECRET} | jq -r '.data["privateKey"]') 
           echo "${nodekey}" > ${MOUNT_PATH}/nodekey
 
           vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tmdir }}" 
           vaultBevelFunc 'readJson' ${vault_secret_key}
-          validateVaultResponseHashicorp "secret (${vault_secret_key})" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE"
+          validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE"
           orion_key=$(echo ${VAULT_SECRET} | jq -r '.data["privateKey"]' | base64 -d)  
           orion_key_pub=$(echo ${VAULT_SECRET} | jq -r '.data["publicKey"]')    
           orion_password=$(echo ${VAULT_SECRET} | jq -r '.data["password"]') 
@@ -138,7 +138,7 @@ spec:
           then
             vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}" 
             vaultBevelFunc 'readJson' ${vault_secret_key}
-            validateVaultResponseHashicorp "secret (${vault_secret_key})" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE"
+            validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE"
             orion_ca=$(echo ${VAULT_SECRET} | jq -r '.data["rootca_pem"]' | base64 -d)  
             orion_cer_pem=$(echo ${VAULT_SECRET} | jq -r '.data["ambassadorcrt"]' | base64 -d)    
             orion_cer_key=$(echo ${VAULT_SECRET} | jq -r '.data["ambassadorkey"]' | base64 -d) 
