@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cravijk2-vaultk8s-job
+  namespace: cravijk2-bes
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: cravijk2-vaultk8s-job
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/shared/charts/vault-k8s-mgmt
+    sourceRef:
+      kind: GitRepository
+      name: flux-besu-ravijk2
+      namespace: flux-besu-ravijk2
+  values:
+    metadata:
+      name: cravijk2-vaultk8s-job
+      namespace: cravijk2-bes
+      images:
+        alpineutils: ghcr.io/hyperledger/alpine-utils:1.0
+        pullPolicy: IfNotPresent
+
+    vault:
+      reviewer_service: vault-reviewer
+      role: vault-role
+      address: http://vault.internal.dev.aws.blockchaincloudpoc-develop.com:20002
+      authpath: besucravijk2
+      policy: vault-crypto-cravijk2-bes-cravijk2-ro
+      policydata: "{\n  \"policy\": \"path \\\"secretsv2/data/cravijk2-bes/crypto/*\\\" {\n    capabilities = [\\\"read\\\", \\\"list\\\", \\\"create\\\", \\\"update\\\"]\n  }\n  path \\\"secretsv2/data/cravijk2-bes/smartContracts/*\\\" {\n    capabilities = [\\\"read\\\", \\\"list\\\"]\n  }\"\n}"
+      secret_path: secretsv2
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    k8s:
+      kubernetes_url: https://300125A3D09FFA0A178EC3522C96BBB8.gr7.eu-west-1.eks.amazonaws.com
