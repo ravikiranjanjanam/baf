@@ -1,0 +1,92 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cravijk2cravijk2member-node
+  namespace: cravijk2-bes
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: cravijk2cravijk2member-node
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/hyperledger-besu/charts/node_besu
+    sourceRef:
+      kind: GitRepository
+      name: flux-besu-ravijk2
+      namespace: flux-besu-ravijk2
+  values:
+    metadata:
+      namespace: cravijk2-bes
+      labels:
+    replicaCount: 1
+    staticnodes:
+      - "enode://7c3376f78d1ec322d8e24171b23b462baafd41fc43750117e873ebe1a38f14ded86a10ce8443c9e8cfdacba12d2f51aff69ca4a3d40c815359b24dccba31f310@validator1.beveldev.dev.aws.blockchaincloudpoc-develop.com:15081"
+      - "enode://3414871f8adffc8968057ea7217d288ba42b390b112523a5a94889a95765ef50db6a2a938b6b4603a7d58e5004d2e1b1fb21374364dd7ca529b1e8168397d6d0@validator2.beveldev.dev.aws.blockchaincloudpoc-develop.com:15083"
+      - "enode://062642157dfaeaf15df7623849d39803bce91551047221011fd456246bed4a432fa4af3171e88712562aa4f949ee332aa13bd4738c474b643a187ec3929a237b@validator3.beveldev.dev.aws.blockchaincloudpoc-develop.com:15085"
+      - "enode://5d63f96cd1eeddc5c37cfc8c4199058a85b6a1d6c2ddd79380fd85c84e52353dd54e4b7e36b58677e0018c769d7c6e1225ab5178df001947998e91d028e83942@validator4.beveldev.dev.aws.blockchaincloudpoc-develop.com:15087"
+      - "enode://ee0c89865c65a908cff92fba4688e9ca3834d7fdac402bef5029536649d94fe675f2da71022dc12674cfbde9ac0dba326525df4fa607cea3dee8578524681272@cravijk2.beveldev.dev.aws.blockchaincloudpoc-develop.com:15089"
+
+    liveliness_check:
+      enabled: false
+    healthcheck:
+      readinessthreshold: 100
+      readinesscheckinterval: 5
+    proxy:
+      provider: ambassador
+      external_url: cravijk2.beveldev.dev.aws.blockchaincloudpoc-develop.com
+      p2p: 15089
+      rpc: 15090
+
+    images:
+      node: hyperledger/besu:22.10.2
+      alpineutils: ghcr.io/hyperledger/bevel-alpine:latest
+      pullPolicy: IfNotPresent
+
+    node:
+      name: cravijk2
+      consensus: ibft
+      subject: O=Carrier,OU=Carrier,L=51.50/-0.13/London,C=GB
+      mountPath: /opt/besu/data
+      servicetype: ClusterIP
+      imagePullSecret: regcred
+      ports:
+        p2p: 30303
+        rpc: 8545
+        ws: 8546
+
+      permissioning:
+        enabled: False
+
+    tm:
+      type: tessera
+      tls: True
+      url: "https://cravijk2-tessera.cravijk2-bes:8888"
+
+    privacy:
+      enabled: true
+      public_key_file: /secrets/tm_key.pub
+      tm_flag: true
+
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+
+    vault:
+      address: http://vault.internal.dev.aws.blockchaincloudpoc-develop.com:20002
+      secretprefix: secretsv2/data/cravijk2-bes/crypto/cravijk2
+      serviceaccountname: vault-auth
+      keyname: data
+      tmdir: tm
+      tlsdir: tls
+      role: vault-role
+      type: hashicorp
+      authpath: besucravijk2
+
+    genesis: ewogICAiY29uZmlnIjogewogICAgICJjaGFpbklkIjogIDIwMTgsCiAgICAgImNvbnN0YW50aW5vcGxlZml4YmxvY2siOiAwLAogICAgICJjb250cmFjdFNpemVMaW1pdCI6IDIxNDc0ODM2NDcsCiAgICAgImliZnQyIjogewogICAgICAgImJsb2NrcGVyaW9kc2Vjb25kcyI6IDIsCiAgICAgICAiZXBvY2hsZW5ndGgiOiAzMDAwMCwKICAgICAgICJyZXF1ZXN0dGltZW91dHNlY29uZHMiOiAxMAogICAgIH0KICAgfSwKICAgIm5vbmNlIjogIjB4MCIsCiAgICJ0aW1lc3RhbXAiOiAiMHg1OGVlNDBiYSIsCiAgICJnYXNMaW1pdCI6ICIweDFmZmZmZmZmZmZmZmZmIiwKICAgImRpZmZpY3VsdHkiOiAiMHgxIgp9
+
+ 
+
+    metrics:
+      enabled: False
+      port: 9545
