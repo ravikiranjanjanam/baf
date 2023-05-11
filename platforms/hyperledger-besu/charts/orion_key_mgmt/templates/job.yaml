@@ -60,6 +60,8 @@ spec:
             value: {{ $.Values.vault.authpath }}
           - name: VAULT_APP_ROLE
             value: {{ $.Values.vault.role }}
+          - name: VAULT_SECRET_ENGINE
+            value: {{ $.Values.vault.secretengine }}
           - name: VAULT_ORION_SECRET_PREFIX
             value: "{{ $.Values.vault.tmprefix }}"
           - name: VAULT_TYPE
@@ -74,7 +76,7 @@ spec:
               vaultBevelFunc 'init'
               validateVaultResponseHashicorp 'vault login token' "${VAULT_TOKEN}"
 
-              vault_secret_key="${VAULT_ORION_SECRET_PREFIX}"
+              vault_secret_key="${VAULT_SECRET_ENGINE}/${VAULT_ORION_SECRET_PREFIX}"
               echo "Getting Orion password using key $vault_secret_key"
               vaultBevelFunc 'readJson' ${vault_secret_key}
               

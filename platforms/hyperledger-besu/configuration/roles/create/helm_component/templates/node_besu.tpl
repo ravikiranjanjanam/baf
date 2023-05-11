@@ -91,7 +91,8 @@ spec:
 
     vault:
       address: {{ vault.url }}
-      secretprefix: {{ vault.secret_path | default('secretsv2') }}/data/{{ component_ns }}/crypto/{{ peer.name }}
+      secretengine: {{ vault.secret_path | default('secretsv2') }}
+      secretprefix: data/{{ component_ns }}/crypto/{{ peer.name }}
       serviceaccountname: vault-auth
       keyname: data
       tmdir: tm

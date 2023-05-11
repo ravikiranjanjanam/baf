@@ -90,6 +90,8 @@ spec:
         env:
         - name: VAULT_ADDR
           value: {{ .Values.vault.address }}
+        - name: VAULT_SECRET_ENGINE
+          value: {{ $.Values.vault.secretengine }}
         - name: VAULT_SECRET_PREFIX
           value: {{ .Values.vault.secretprefix }}
         - name: KUBERNETES_AUTH_PATH
@@ -112,7 +114,7 @@ spec:
           echo "logged in"
           mkdir -p ${MOUNT_PATH}
 
-          vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
+          vault_secret_key="${VAULT_SECRET_ENGINE}/${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
           echo "Getting node private key from $vault_secret_key" 
           vaultBevelFunc 'readJson' ${vault_secret_key}
           validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
@@ -121,7 +123,7 @@ spec:
 
           if [ {{ $.Values.privacy.tm_flag }} == "true" ]
           then
-            vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tmdir }}" 
+            vault_secret_key="${VAULT_SECRET_ENGINE}/${VAULT_SECRET_PREFIX}/{{ .Values.vault.tmdir }}" 
             echo "Getting transaction manager public key from $vault_secret_key"
             vaultBevelFunc 'readJson' ${vault_secret_key}
             validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
@@ -131,7 +133,7 @@ spec:
         
           if [ {{ $.Values.tm.tls }} == "true" ]
           then
-            vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}" 
+            vault_secret_key="${VAULT_SECRET_ENGINE}/${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}" 
             echo "Getting tls knownServer, keystore and keystore password from $vault_secret_key"
             vaultBevelFunc 'readJson' ${vault_secret_key}
             validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 

@@ -88,7 +88,7 @@ spec:
           OUTPUT_PATH=${MOUNT_PATH}/check_certs;
           mkdir -p ${OUTPUT_PATH}
 
-          vault_secret_key=${VAULT_SECRET_ROOTCA}
+          vault_secret_key="${VAULT_SECRET_ENGINE}/${VAULT_SECRET_ROOTCA}""
           echo "Checking certs in ${vault_secret_key}"
           vaultBevelFunc "readJson" ${vault_secret_key} 
           CA_PEM=$(echo ${VAULT_SECRET} | jq -r '.data["rootca_pem"]' 2>&1)
@@ -109,7 +109,7 @@ spec:
             echo  $CA_KEY | base64 -d >> ${ROOTCA_PATH}/rootca.key
           fi
 
-          vault_secret_key=${VAULT_SECRET_AMBASSADORTLS}
+          vault_secret_key="${VAULT_SECRET_ENGINE}/${VAULT_SECRET_AMBASSADORTLS}""
           echo "Checking certs in ${vault_secret_key}"
           vaultBevelFunc "readJson" ${vault_secret_key} 
           data_info=$(echo ${VAULT_SECRET} | jq -r '.data["rootca_pem"]' 2>&1)
@@ -365,12 +365,12 @@ spec:
                 fi;
 
                 # This command copy the tls certificates to the Vault
-                  vaultBevelFunc 'write' ${VAULT_SECRET_AMBASSADORTLS} 'payload.json'
+                  vaultBevelFunc 'write' "${VAULT_SECRET_ENGINE}/${VAULT_SECRET_AMBASSADORTLS}" 'payload.json'
 
                 if [ "$TM_TLS_ENABLED" == "true" ]
                 then
                   # Check tls certificates when tm_tls is true
-                  vaultBevelFunc 'readJson' ${VAULT_SECRET_AMBASSADORTLS}
+                  vaultBevelFunc 'readJson' "${VAULT_SECRET_ENGINE}/${VAULT_SECRET_AMBASSADORTLS}"
                   CA_PEM=$(echo ${VAULT_SECRET} | jq -r '.data["rootca_pem"]' 2>&1)
                   CA_KEY=$(echo ${VAULT_SECRET} | jq -r '.data["rootca_key"]' 2>&1)
                   AMBASSADORCRT=$(echo ${VAULT_SECRET} | jq -r '.data["ambassadorcrt"]' 2>&1)
@@ -392,7 +392,7 @@ spec:
                 else
 
                   # Check tls certificates when tm_tls is false
-                  vaultBevelFunc 'readJson' ${VAULT_SECRET_AMBASSADORTLS}
+                  vaultBevelFunc 'readJson' "${VAULT_SECRET_ENGINE}/${VAULT_SECRET_AMBASSADORTLS}"
                   CA_PEM=$(echo ${VAULT_SECRET} | jq -r '.data["rootca_pem"]' 2>&1)
                   CA_KEY=$(echo ${VAULT_SECRET} | jq -r '.data["rootca_key"]' 2>&1)
                   AMBASSADORCRT=$(echo ${VAULT_SECRET} | jq -r '.data["ambassadorcrt"]' 2>&1)
@@ -425,10 +425,10 @@ spec:
                   }" > payload.json
 
                 # This command copy the rootca certificates to the Vault
-                  vaultBevelFunc 'write' ${VAULT_SECRET_ROOTCA} 'payload.json'
+                  vaultBevelFunc 'write' "${VAULT_SECRET_ENGINE}/${VAULT_SECRET_ROOTCA}" 'payload.json'
 
                 # Check rootca certificates
-                vaultBevelFunc 'readJson' ${VAULT_SECRET_ROOTCA}
+                vaultBevelFunc 'readJson' "${VAULT_SECRET_ENGINE}/${VAULT_SECRET_ROOTCA}"
                 CA_PEM=$(echo ${VAULT_SECRET} | jq -r '.data["rootca_pem"]' 2>&1)
                 CA_KEY=$(echo ${VAULT_SECRET} | jq -r '.data["rootca_key"]' 2>&1)
 

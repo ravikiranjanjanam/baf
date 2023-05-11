@@ -96,6 +96,8 @@ spec:
         env:
         - name: VAULT_ADDR
           value: {{ .Values.vault.address }}
+        - name: VAULT_SECRET_ENGINE
+          value: {{ $.Values.vault.secretengine }}
         - name: VAULT_SECRET_PREFIX
           value: {{ .Values.vault.secretprefix }}
         - name: KUBERNETES_AUTH_PATH
@@ -118,13 +120,13 @@ spec:
 
           mkdir -p ${MOUNT_PATH}
 
-          vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
+          vault_secret_key="${VAULT_SECRET_ENGINE}/${VAULT_SECRET_PREFIX}/{{ .Values.vault.keyname }}"
           vaultBevelFunc 'readJson' ${vault_secret_key}
           validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE" 
           nodekey=$(echo ${VAULT_SECRET} | jq -r '.data["privateKey"]') 
           echo "${nodekey}" > ${MOUNT_PATH}/nodekey
 
-          vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tmdir }}" 
+          vault_secret_key="${VAULT_SECRET_ENGINE}/${VAULT_SECRET_PREFIX}/{{ .Values.vault.tmdir }}" 
           vaultBevelFunc 'readJson' ${vault_secret_key}
           validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE"
           orion_key=$(echo ${VAULT_SECRET} | jq -r '.data["privateKey"]' | base64 -d)  
@@ -136,7 +138,7 @@ spec:
         
           if [ {{ $.Values.orion.tls }} == "true" ]
           then
-            vault_secret_key="${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}" 
+            vault_secret_key="${VAULT_SECRET_ENGINE}/${VAULT_SECRET_PREFIX}/{{ .Values.vault.tlsdir }}" 
             vaultBevelFunc 'readJson' ${vault_secret_key}
             validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_SECRET}" "LOOKUPSECRETRESPONSE"
             orion_ca=$(echo ${VAULT_SECRET} | jq -r '.data["rootca_pem"]' | base64 -d)  
