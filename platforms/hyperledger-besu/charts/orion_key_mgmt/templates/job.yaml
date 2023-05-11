@@ -101,7 +101,7 @@ spec:
               }" > payload.json
               vaultBevelFunc 'write' ${vault_secret_key} 'payload.json'
               
-              #validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_RESPONSE}" "LOOKUPSECRETRESPONSE"
+              validateVaultResponseHashicorp "${vault_secret_key}" "${VAULT_RESPONSE}" "LOOKUPSECRETRESPONSE"
 
               # get privateKey from vault
               vaultBevelFunc 'readJson' ${vault_secret_key}
