@@ -1,0 +1,86 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: scravijk2validator3validator-node
+  namespace: scravijk2-bes
+  annotations:
+    flux.weave.works/automated: "false"
+spec:
+  releaseName: scravijk2validator3validator-node
+  interval: 1m
+  chart:
+   spec:
+    chart: platforms/hyperledger-besu/charts/node_validator
+    sourceRef:
+      kind: GitRepository
+      name: flux-besu-ravijk2
+      namespace: flux-besu-ravijk2
+  values:
+    replicaCount: 1
+
+    healthcheck:
+      readinessthreshold: 100
+      readinesscheckinterval: 5
+
+    staticnodes:
+      - "enode://f409f5ebed3232c7a339029755e381e3d0e1e65085c3d9c99c3f4a043cd7d8c4b307d9f37c30417ae6f804a6e9c99ed3d163999a65e20630835b3654131542a0@validator1.beveldev.dev.aws.blockchaincloudpoc-develop.com:15081"
+      - "enode://44ab7953d0c8531ca5b2ccb936abd8b5268b59a676d6a7214a7516e8b9bb3b22bc5696b57fa80d5df39e12a631607405b5130a643c3e2864847d239c3085a76f@validator2.beveldev.dev.aws.blockchaincloudpoc-develop.com:15083"
+      - "enode://6abb8688853c089512617c41462e7d9aed0681398b3febe56805b2e37060a7506f4c460a1dc488b7dd30b05d4d8e7955960c90c065a4d6c8c255035109725a97@validator3.beveldev.dev.aws.blockchaincloudpoc-develop.com:15085"
+      - "enode://bedef5538bd603cb1707b328ad7ebfd492157af1bcc59d245bb5c8acd4776e857eaba2dd9a2800a90ee97bd7d873cbed25c5de1e8fbed89fe45ca17ecf888aec@validator4.beveldev.dev.aws.blockchaincloudpoc-develop.com:15087"
+      - "enode://3a3609acce2dbb55d5f448c1d5b75fbedaf4353621787005108fbdb40b865d7ca5df3352610f940c02cd1038964a9b04716c77b1a93955fd6761f33201969e92@cravijk2.beveldev.dev.aws.blockchaincloudpoc-develop.com:15089"
+
+    metadata:
+      namespace: scravijk2-bes
+      labels:
+
+    ambassador:
+      external_url_suffix: beveldev.dev.aws.blockchaincloudpoc-develop.com
+
+    liveliness_check:
+      enabled: false
+    proxy:
+      provider: ambassador
+      external_url: scravijk2.beveldev.dev.aws.blockchaincloudpoc-develop.com
+      p2p: 15085
+      rpc: 15086
+
+    images:
+      node: hyperledger/besu:22.10.2
+      alpineutils: ghcr.io/hyperledger/bevel-alpine:latest
+      pullPolicy: IfNotPresent
+
+    node:
+      name: validator3
+      tls: True
+      consensus: ibft
+      mountPath: /opt/besu/data
+      servicetype: ClusterIP
+      imagePullSecret: regcred
+      ports:
+        p2p: 30303
+        rpc: 8545
+        ws: 8546
+
+      permissioning:
+        enabled: False
+      
+    storage:
+      storageclassname: awsstorageclass
+      storagesize: 1Gi
+
+    vault:
+      address: http://vault.internal.dev.aws.blockchaincloudpoc-develop.com:20002
+      secretprefix: secretsv2/data/scravijk2-bes/crypto/validator3
+      serviceaccountname: vault-auth
+      keyname: data
+      tlsdir: tls
+      role: vault-role
+      authpath: besuscravijk2
+      type: hashicorp
+
+    genesis: ewogICAiY29uZmlnIjogewogICAgICJjaGFpbklkIjogIDIwMTgsCiAgICAgImNvbnN0YW50aW5vcGxlZml4YmxvY2siOiAwLAogICAgICJjb250cmFjdFNpemVMaW1pdCI6IDIxNDc0ODM2NDcsCiAgICAgImliZnQyIjogewogICAgICAgImJsb2NrcGVyaW9kc2Vjb25kcyI6IDIsCiAgICAgICAiZXBvY2hsZW5ndGgiOiAzMDAwMCwKICAgICAgICJyZXF1ZXN0dGltZW91dHNlY29uZHMiOiAxMAogICAgIH0KICAgfSwKICAgIm5vbmNlIjogIjB4MCIsCiAgICJ0aW1lc3RhbXAiOiAiMHg1OGVlNDBiYSIsCiAgICJnYXNMaW1pdCI6ICIweDFmZmZmZmZmZmZmZmZmIiwKICAgImRpZmZpY3VsdHkiOiAiMHgxIgp9
+
+
+    metrics:
+      enabled: False
+      port: 9545    
