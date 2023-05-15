@@ -20,14 +20,6 @@
   - name: create kubeconfig directory
     shell: mkdir -p /tmp/molecule/kind-default
 
-  - name: get docker running instances
-    shell: docker ps -a; uname -a
-    register: container
-  
-  - name: get output of container
-    debug: 
-      msg: "{{ container }}"
-
   - name: get the content of kubeconfig
     shell: cat /root/.kube/config
     register: configop
@@ -37,9 +29,10 @@
       msg: "{{configop}}"
 
   - name: Fetch the kubeconfig
-    copy:
+    copy: 
+      content: "{{configop.stdout}}"
       dest: "{{ kubeconfig }}"
-      src: /root/.kube/config
+    delegate_to: localhost
 
   - name: check the kubeconfig variable
     debug:
