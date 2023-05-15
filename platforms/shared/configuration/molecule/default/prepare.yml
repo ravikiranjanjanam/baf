@@ -20,6 +20,14 @@
   - name: create kubeconfig directory
     shell: mkdir -p /tmp/molecule/kind-default
 
+  - name: get the name of running container
+    shell: docker ps 
+    register: container
+  
+  - name: display container output
+    debug:
+      msg: "{{ container.stdout }}"
+      
   - name: get the kubeconfig file
     shell: docker exec -it kind-default cat /root/.kube/config > "{{ kubeconfig }}"
 
