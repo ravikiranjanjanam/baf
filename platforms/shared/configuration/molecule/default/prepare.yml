@@ -70,6 +70,22 @@
     debug: 
       msg: "{{ kubeafter.stdout }}"
 
+  - name: check the pods output
+    shell: export KUBECONFIG="{{ kubeconfig }}" kubectl get pods -A 
+    register: podsop
+
+  - name: get pods op
+    debug:
+      msg: "{{ podsop.stdout }}"
+
+  - name: check the netstat output
+    shell: netstat -anp|egrep '10080|443' 
+    register: netstatop
+  
+  - name: get netstat op 
+    debug:
+      msg: "{{ netstatop.stdout }}"
+
   - name: Wait for the Kubernetes API to become available (this could take a minute)
     uri:
       url: "http://localhost:10080/kubernetes-ready"
