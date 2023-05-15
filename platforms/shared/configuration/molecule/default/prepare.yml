@@ -19,6 +19,7 @@
 
   - name: create kubeconfig directory
     shell: mkdir -p /tmp/molecule/kind-default
+    delegate_to: localhost
 
   - name: get the content of kubeconfig
     shell: cat /root/.kube/config
@@ -40,6 +41,7 @@
 
   - name: Display kubeconfig before modifications
     shell: cat "{{ kubeconfig }}"
+    delegate_to: localhost
 
   - name: Change the kubeconfig port to the proper value
     replace:
@@ -56,6 +58,7 @@
 
   - name: Display kubeconfig after modifications
     shell: cat "{{ kubeconfig }}"
+    delegate_to: localhost
 
   - name: Wait for the Kubernetes API to become available (this could take a minute)
     uri:
@@ -66,3 +69,4 @@
     until: (result.status|default(-1)) == 200
     retries: 30
     delay: 5
+    delegate_to: localhost
