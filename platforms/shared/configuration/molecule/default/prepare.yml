@@ -41,7 +41,12 @@
 
   - name: Display kubeconfig before modifications
     shell: cat "{{ kubeconfig }}"
+    register: kubebefore
     delegate_to: localhost
+
+  - name: debug kubeconfig before modifications
+    debug: 
+      msg: "{{ kubebefore.stdout }}"
 
   - name: Change the kubeconfig port to the proper value
     replace:
@@ -58,7 +63,12 @@
 
   - name: Display kubeconfig after modifications
     shell: cat "{{ kubeconfig }}"
+    register: kubeafter
     delegate_to: localhost
+
+  - name: debug kubeconfig after modifications
+    debug: 
+      msg: "{{ kubeafter.stdout }}"
 
   - name: Wait for the Kubernetes API to become available (this could take a minute)
     uri:
