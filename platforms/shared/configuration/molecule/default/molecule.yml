@@ -33,4 +33,3 @@ provisioner:
     ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/roles
 verifier:
   name: ansible
-
