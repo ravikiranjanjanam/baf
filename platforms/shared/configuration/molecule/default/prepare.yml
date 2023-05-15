@@ -22,6 +22,11 @@
 
   - name: get docker running instances
     shell: docker ps -a; uname -a
+    register: container
+  
+  - name: get output of container
+    debug: 
+      msg: "{{ container }}"
 
   - name: Fetch the kubeconfig
     fetch:
