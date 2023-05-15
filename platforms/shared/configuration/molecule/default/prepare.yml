@@ -28,6 +28,14 @@
     debug: 
       msg: "{{ container }}"
 
+  - name: get the content of kubeconfig
+    shell: cat /root/.kube/config
+    register: configop
+
+  - name: read configop
+    debug:
+      msg: "{{configop}}"
+
   - name: Fetch the kubeconfig
     fetch:
       dest: '{{ kubeconfig }}'
