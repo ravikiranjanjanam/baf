@@ -17,6 +17,9 @@
       state: absent
     delegate_to: localhost
 
+  - name: get the kubeconfig file
+    shell: docker exec -it kind-default cat /root/.kube/config > "{{ kubeconfig }}"
+    
   - name: Fetch the kubeconfig
     fetch:
       dest: '{{ kubeconfig }}'
