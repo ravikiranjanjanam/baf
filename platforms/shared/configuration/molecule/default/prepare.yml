@@ -20,6 +20,9 @@
   - name: create kubeconfig directory
     shell: mkdir -p /tmp/molecule/kind-default
 
+  - name: get docker running instances
+    shell: docker ps -a; uname -a
+
   - name: Fetch the kubeconfig
     fetch:
       dest: '{{ kubeconfig }}'
