@@ -22,6 +22,10 @@
       dest: '{{ kubeconfig }}'
       flat: yes
       src: /root/.kube/config
+  
+  - name: Display kubeconfig before modifications
+    shell: |
+      cat /root/.kube/config
 
   - name: Change the kubeconfig port to the proper value
     replace:
@@ -35,6 +39,10 @@
       replace: "localhost"
       path: '{{ kubeconfig }}'
     delegate_to: localhost
+
+  - name: Display kubeconfig after modifications
+    shell: |
+      cat /root/.kube/config
 
   - name: Wait for the Kubernetes API to become available (this could take a minute)
     uri:
