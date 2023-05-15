@@ -23,6 +23,10 @@
       flat: yes
       src: /root/.kube/config
 
+  - name: check the kubeconfig variable
+    debug:
+      msg: "{{ kubeconfig }}"
+      
   - name: Display kubeconfig before modifications
     shell: |
       cat /root/.kube/config
