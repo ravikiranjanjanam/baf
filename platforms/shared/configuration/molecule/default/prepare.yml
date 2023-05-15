@@ -37,9 +37,8 @@
       msg: "{{configop}}"
 
   - name: Fetch the kubeconfig
-    fetch:
-      dest: '{{ kubeconfig }}'
-      flat: yes
+    copy:
+      dest: "{{ kubeconfig }}"
       src: /root/.kube/config
 
   - name: check the kubeconfig variable
