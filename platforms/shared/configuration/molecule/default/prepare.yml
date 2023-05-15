@@ -54,6 +54,7 @@
       replace: "{{ lookup('env', 'KIND_PORT') }}"
       path: "{{ kubeconfig }}"
     delegate_to: localhost
+    
   - name: Change the kubeconfig server to localhost
     replace:
       regexp: '172.30.99.1'
@@ -70,15 +71,6 @@
     debug: 
       msg: "{{ kubeafter.stdout }}"
 
-  - name: check the pods output
-    shell:  kubectl get pods -A 
-    register: podsop
-    delegate_to: localhost
-
-  - name: get pods op
-    debug:
-      msg: "{{ podsop.stdout }}"
-
   - name: check the netstat output
     shell: netstat -anp|egrep '10080|443' 
     register: netstatop
@@ -87,6 +79,15 @@
   - name: get netstat op 
     debug:
       msg: "{{ netstatop.stdout }}"
+
+  - name: check the pods output
+    shell:  kubectl get pods -A 
+    register: podsop
+    delegate_to: localhost
+
+  - name: get pods op
+    debug:
+      msg: "{{ podsop.stdout }}"
 
   - name: Wait for the Kubernetes API to become available (this could take a minute)
     uri:
