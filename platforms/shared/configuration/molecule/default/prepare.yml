@@ -19,16 +19,19 @@
 
   - name: get the kubeconfig file
     shell: docker exec -it kind-default cat /root/.kube/config > "{{ kubeconfig }}"
-    
+
   - name: Fetch the kubeconfig
     fetch:
       dest: '{{ kubeconfig }}'
       flat: yes
       src: /root/.kube/config
-  
+
+  - name: check the kubeconfig variable
+    debug:
+      msg: "{{ kubeconfig }}"
+
   - name: Display kubeconfig before modifications
-    shell: |
-      cat "{{ kubeconfig }}"
+    shell: cat "{{ kubeconfig }}"
 
   - name: Change the kubeconfig port to the proper value
     replace:
@@ -44,8 +47,7 @@
     delegate_to: localhost
 
   - name: Display kubeconfig after modifications
-    shell: |
-      cat "{{ kubeconfig }}"
+    shell: cat "{{ kubeconfig }}"
 
   - name: Wait for the Kubernetes API to become available (this could take a minute)
     uri:
@@ -54,5 +56,5 @@
       validate_certs: no
     register: result
     until: (result.status|default(-1)) == 200
-    retries: 60
+    retries: 30
     delay: 5
