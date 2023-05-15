@@ -71,8 +71,9 @@
       msg: "{{ kubeafter.stdout }}"
 
   - name: check the pods output
-    shell: export KUBECONFIG="{{ kubeconfig }}" kubectl get pods -A 
+    shell:  kubectl get pods -A 
     register: podsop
+    delegate_to: localhost
 
   - name: get pods op
     debug:
@@ -81,7 +82,8 @@
   - name: check the netstat output
     shell: netstat -anp|egrep '10080|443' 
     register: netstatop
-  
+    delegate_to: localhost
+    
   - name: get netstat op 
     debug:
       msg: "{{ netstatop.stdout }}"
