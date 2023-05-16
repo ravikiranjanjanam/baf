@@ -39,13 +39,13 @@
       kubeconfig: "{{ kubeconfig_path }}"
       context: "{{ kubecontext }}"
       label_selectors:
-        - run = haproxy-ingress
+        - app.kubernetes.io/name = haproxy-ingress
       field_selectors:
         - status.phase=Running
     register: haproxy_status
   - name: debug haproxy status output
     debug: 
-      msg: {{ haproxy_status }}
+      msg: "{{ haproxy_status }}"
   - name: Assert HAproxy has been installed
     assert:
       that: haproxy_status.resources|length == 1
