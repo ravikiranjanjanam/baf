@@ -17,42 +17,24 @@
       state: absent
     delegate_to: localhost
 
-  - name: create kubeconfig directory
-    shell: mkdir -p /tmp/molecule/kind-default
-    delegate_to: localhost
-
-  - name: get the content of kubeconfig
-    shell: cat /root/.kube/config
-    register: configop
-
-  - name: read configop
-    debug:
-      msg: "{{configop}}"
-
   - name: Fetch the kubeconfig
-    copy: 
-      content: "{{configop.stdout}}"
-      dest: "{{ kubeconfig }}"
+    fetch:
+      dest: '{{ kubeconfig }}'
+      flat: yes
+      src: /root/.kube/config
+
+  - name: Change the kubeconfig port to the proper value
+    replace:
+      regexp: '8443'
+      replace: "{{ lookup('env', 'KIND_PORT') }}"
+      path: '{{ kubeconfig }}'
     delegate_to: localhost
-
-  - name: check the kubeconfig variable
-    debug:
-      msg: "{{ kubeconfig }}"
-
-  - name: Display kubeconfig before modifications
-    shell: cat "{{ kubeconfig }}"
-    register: kubebefore
-    delegate_to: localhost
-
-  - name: debug kubeconfig before modifications
-    debug: 
-      msg: "{{ kubebefore.stdout }}"
 
   - name: Change the kubeconfig server to localhost
     replace:
       regexp: '172.30.99.1'
       replace: "localhost"
-      path: "{{ kubeconfig }}"
+      path: '{{ kubeconfig }}'
     delegate_to: localhost
 
   - name: Display kubeconfig after modifications
@@ -63,15 +45,6 @@
   - name: debug kubeconfig after modifications
     debug: 
       msg: "{{ kubeafter.stdout }}"
-
-  - name: check the netstat output
-    shell: netstat -anp|egrep '10080|443' 
-    register: netstatop
-    delegate_to: localhost
-    
-  - name: get netstat op 
-    debug:
-      msg: "{{ netstatop.stdout }}"
 
   - name: check the pods output
     shell:  kubectl get pods -A 
@@ -91,4 +64,3 @@
     until: (result.status|default(-1)) == 200
     retries: 30
     delay: 5
-    delegate_to: localhost
