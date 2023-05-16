@@ -19,7 +19,7 @@
 
   - name: Fetch the kubeconfig
     fetch:
-      dest: '{{ kubeconfig }}'
+      dest: "{{ kubeconfig }}"
       flat: yes
       src: /root/.kube/config
 
@@ -27,7 +27,7 @@
     replace:
       regexp: '172.30.99.1'
       replace: "localhost"
-      path: '{{ kubeconfig }}'
+      path: "{{ kubeconfig }}"
     delegate_to: localhost
 
   - name: Display kubeconfig after modifications
@@ -39,6 +39,15 @@
     debug: 
       msg: "{{ kubeafter.stdout }}"
 
+  - name: check the netstat output
+    shell: netstat -anp|egrep '10080|443' 
+    register: netstatop
+    delegate_to: localhost
+    
+  - name: get netstat op 
+    debug:
+      msg: "{{ netstatop.stdout }}"
+      
   - name: check the pods output
     shell:  kubectl get pods -A 
     register: podsop
