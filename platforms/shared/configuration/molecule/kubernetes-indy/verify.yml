@@ -43,6 +43,9 @@
       field_selectors:
         - status.phase=Running
     register: haproxy_status
+  - name: debug haproxy status output
+    debug: 
+      msg: {{ haproxy_status }}
   - name: Assert HAproxy has been installed
     assert:
       that: haproxy_status.resources|length == 1
