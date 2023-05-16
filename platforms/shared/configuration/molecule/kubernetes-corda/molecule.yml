@@ -27,8 +27,6 @@ platforms:
 provisioner:
   name: ansible
   log: True
-  lint: |
-    ansible-lint
   env:
     K8S_AUTH_KUBECONFIG: /tmp/molecule/kind-default/kubeconfig
     KUBECONFIG: /tmp/molecule/kind-default/kubeconfig
@@ -36,5 +34,3 @@ provisioner:
     KIND_PORT: '${TEST_CLUSTER_PORT:-10443}'
 verifier:
   name: ansible
-  lint: |
-    ansible-lint
