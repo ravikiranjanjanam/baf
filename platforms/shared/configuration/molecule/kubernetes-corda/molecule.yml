@@ -22,7 +22,7 @@ platforms:
       - 8443/tcp
       - 10080/tcp
     published_ports:
-      - 0.0.0.0:${TEST_CLUSTER_PORT:-10443}:8443/tcp
+      - 0.0.0.0:${TEST_CLUSTER_PORT:-8443}:8443/tcp
       - 0.0.0.0:${TEST_CLUSTER_PORT:-10080}:10080/tcp
     pre_build_image: yes
 provisioner:
@@ -32,6 +32,5 @@ provisioner:
     K8S_AUTH_KUBECONFIG: /tmp/molecule/kind-default/kubeconfig
     KUBECONFIG: /tmp/molecule/kind-default/kubeconfig
     ANSIBLE_ROLES_PATH: ${MOLECULE_PROJECT_DIRECTORY}/roles
-    KIND_PORT: '${TEST_CLUSTER_PORT:-10443}'
 verifier:
   name: ansible
