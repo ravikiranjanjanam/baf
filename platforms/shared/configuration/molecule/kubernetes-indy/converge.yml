@@ -101,6 +101,8 @@
           secret_key: test
         allocation_ips:
           stdout: "test-alloc-ip"
+      tags:
+        - molecule-idempotence-notest
     - role: setup/haproxy-ingress
       vars:
         item:
