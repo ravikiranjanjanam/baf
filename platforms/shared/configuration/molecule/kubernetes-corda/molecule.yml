@@ -16,7 +16,7 @@ platforms:
     groups:
     - k8s
     image: bsycorp/kind:latest-1.23
-    privileged: True
+    privileged: true
     override_command: no
     exposed_ports:
       - 8443/tcp
