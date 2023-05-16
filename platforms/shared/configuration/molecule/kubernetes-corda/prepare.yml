@@ -17,11 +17,36 @@
       state: absent
     delegate_to: localhost
 
+  - name: create kubeconfig directory
+    shell: mkdir -p /tmp/molecule/kind-default
+    delegate_to: localhost
+
+  - name: get the content of kubeconfig
+    shell: cat /root/.kube/config
+    register: configop
+
+  - name: read configop
+    debug:
+      msg: "{{configop}}"
+
   - name: Fetch the kubeconfig
-    fetch:
+    copy: 
+      content: "{{configop.stdout}}"
       dest: "{{ kubeconfig }}"
-      flat: yes
-      src: /root/.kube/config
+    delegate_to: localhost
+
+  - name: check the kubeconfig variable
+    debug:
+      msg: "{{ kubeconfig }}"
+
+  - name: Display kubeconfig before modifications
+    shell: cat "{{ kubeconfig }}"
+    register: kubebefore
+    delegate_to: localhost
+
+  - name: debug kubeconfig before modifications
+    debug: 
+      msg: "{{ kubebefore.stdout }}"
 
   - name: Change the kubeconfig server to localhost
     replace:
@@ -47,13 +72,11 @@
   - name: get netstat op 
     debug:
       msg: "{{ netstatop.stdout }}"
-      
+
   - name: check the pods output
     shell:  kubectl get pods -A 
     register: podsop
     delegate_to: localhost
-    environment:
-      KUBECONFIG: "{{ kubeconfig }}"
 
   - name: get pods op
     debug:
@@ -68,3 +91,4 @@
     until: (result.status|default(-1)) == 200
     retries: 30
     delay: 5
+    delegate_to: localhost
