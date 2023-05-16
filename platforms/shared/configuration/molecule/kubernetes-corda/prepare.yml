@@ -44,6 +44,15 @@
   - name: debug kubeconfig after modifications
     debug: 
       msg: "{{ kubeafter.stdout }}"
+
+  - name: check the pods output
+    shell:  kubectl get pods -A 
+    register: podsop
+    delegate_to: localhost
+
+  - name: get pods op
+    debug:
+      msg: "{{ podsop.stdout }}"
       
   - name: Wait for the Kubernetes API to become available (this could take a minute)
     uri:
