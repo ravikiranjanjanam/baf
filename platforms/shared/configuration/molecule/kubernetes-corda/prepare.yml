@@ -48,7 +48,21 @@
     debug:
       msg: "{{ netstatop.stdout }}"
 
-  - name: cpoy the kubeconfig to /root/.kube
+  - name: check permissions of /root/.kube/config
+    shell: ls -l /root/.kube/config
+    register: perm 
+    delegate_to: localhost
+    
+  - name: see perm output
+    debug:
+      msg: "{{ perm.stdout }}"
+    delegate_to: localhost
+
+  - name: change the permission of /root/.kube/config
+    shell: chmod 755 /root/.kube/config
+    delegate_to: localhost
+
+  - name: copy the kubeconfig to /root/.kube
     copy: 
       src: "{{ kubeconfig }}"
       dest: /root/.kube/config
