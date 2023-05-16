@@ -47,6 +47,12 @@
   - name: get netstat op 
     debug:
       msg: "{{ netstatop.stdout }}"
+
+  - name: cpoy the kubeconfig to /root/.kube
+    copy: 
+      src: "{{ kubeconfig }}"
+      dest: /root/.kube/config
+    delegate_to: localhost
       
   - name: check the pods output
     shell:  kubectl get pods -A 
