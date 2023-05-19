@@ -12,7 +12,7 @@ name: Test Ansible using Molecule
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ workflowfixtest1 ]
     types: [opened, edited, synchronize, reopened]
 
 jobs:
