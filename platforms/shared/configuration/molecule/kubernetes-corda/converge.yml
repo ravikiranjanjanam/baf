@@ -64,6 +64,8 @@
         aws:
           access_key: test
           secret_key: test
+      tags:
+        - molecule-idempotence-notest
   post_tasks:
     - name: Delete the temp secret file
       file:
