@@ -18,7 +18,7 @@ platforms:
     image: bsycorp/kind:latest-1.23
     privileged: True
     override_command: no
-    memory: 1GB
+    memory: 1
     exposed_ports:
       - 8443/tcp
       - 10080/tcp
