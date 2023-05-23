@@ -20,7 +20,7 @@
  
 # This sets a fact values_dir_path
 - set_fact:
-    release_dir_path: "{{ release_dir }}/{{ org_name }}/{{ component_name }}"
+    release_dir_path: "{{ release_dir }}/{{ org.name }}/{{ component_name }}"
   when: component_type not in component_list
 
 # Task to check if values file are already created or not
