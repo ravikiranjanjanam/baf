@@ -313,3 +313,5 @@
                     consensus: kafka
                     grpc:
                       port: 7050
+      tags:
+        - molecule-idempotence-notest     
