@@ -64,10 +64,13 @@
 #####################################################################################
   #This task checks if the value file is created for cacerts-job of the orderers
   - name: Check if the value file is created for cacerts-job of the orderers
-    stat:
-      path: "./build/testorderer/testorderer/testorderer-cacerts-job.yaml"
+    shell: ls ./build/testorderer/
+      #path: "./build/testorderer/testorderer/testorderer-cacerts-job.yaml"
     register: orderer_ca_job_check
   
+  - name: debug testorderer content under build dir
+    debug:
+      msg: "{{ orderer_ca_job_check.stdout }}"
 #####################################################################################
   #This task assert if the value file is created for cacerts-job of the orderers
   - name: Assert if the value file is created for cacerts-job of the orderers
