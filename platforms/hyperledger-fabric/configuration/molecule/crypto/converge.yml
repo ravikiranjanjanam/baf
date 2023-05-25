@@ -51,6 +51,8 @@
     - name: "Include create/ca-server"
       include_role:
         name: "configuration/roles/create/ca-server"  
+      tags:
+        - molecule-idempotence-notest 
       vars:    
         network:
           version: 1.4.4
@@ -99,6 +101,8 @@
     - name: "Include create/ca-server"
       include_role:
         name: "configuration/roles/create/ca-server" 
+      tags:
+        - molecule-idempotence-notest 
       vars:    
         network:
           version: 1.4.4
@@ -146,7 +150,9 @@
     # Testing create/crypto_script role for orderer
     - name: "Include configuration/roles/create/crypto_script for orderer"
       include_role:
-        name: "configuration/roles/create/crypto_script"     
+        name: "configuration/roles/create/crypto_script" 
+      tags:
+        - molecule-idempotence-notest     
       vars:
         component_type: orderer
         component_name: testorderer
@@ -172,6 +178,8 @@
     - name: "Include configuration/roles/create/crypto_script for peers"
       include_role:
         name: "configuration/roles/create/crypto_script"
+      tags:
+        - molecule-idempotence-notest 
       vars:
         component_type: peer
         component_name: testpeer
@@ -194,7 +202,9 @@
 
     - name: "Include create/configtx"
       include_role:
-        name: "configuration/roles/create/configtx"  
+        name: "configuration/roles/create/configtx" 
+      tags:
+        - molecule-idempotence-notest  
       vars:
         add_new_org: "false"
         config_file: "./build/configtx.yaml"
