@@ -195,8 +195,6 @@
     - name: "Include create/configtx"
       include_role:
         name: "configuration/roles/create/configtx"  
-      tags:
-        - molecule-idempotence-notest 
       vars:
         add_new_org: "false"
         config_file: "./build/configtx.yaml"
@@ -273,6 +271,8 @@
     - name: "Include create/channel_artifacts"
       include_role:
         name: "configuration/roles/create/channel_artifacts"
+      tags:
+        - molecule-idempotence-notest 
       vars:
         add_new_org: "false"
         fetch_certs: "false"
