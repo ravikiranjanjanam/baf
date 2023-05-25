@@ -146,9 +146,7 @@
     # Testing create/crypto_script role for orderer
     - name: "Include configuration/roles/create/crypto_script for orderer"
       include_role:
-        name: "configuration/roles/create/crypto_script"
-      tags:
-        - molecule-idempotence-notest     
+        name: "configuration/roles/create/crypto_script"     
       vars:
         component_type: orderer
         component_name: testorderer
@@ -174,6 +172,8 @@
     - name: "Include configuration/roles/create/crypto_script for peers"
       include_role:
         name: "configuration/roles/create/crypto_script"
+      tags:
+        - molecule-idempotence-notest
       vars:
         component_type: peer
         component_name: testpeer
