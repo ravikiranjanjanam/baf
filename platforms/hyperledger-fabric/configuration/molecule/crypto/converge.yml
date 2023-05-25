@@ -172,8 +172,6 @@
     - name: "Include configuration/roles/create/crypto_script for peers"
       include_role:
         name: "configuration/roles/create/crypto_script"
-      tags:
-        - molecule-idempotence-notest
       vars:
         component_type: peer
         component_name: testpeer
@@ -196,7 +194,9 @@
 
     - name: "Include create/configtx"
       include_role:
-        name: "configuration/roles/create/configtx"   
+        name: "configuration/roles/create/configtx"  
+      tags:
+        - molecule-idempotence-notest 
       vars:
         add_new_org: "false"
         config_file: "./build/configtx.yaml"
