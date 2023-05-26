@@ -39,7 +39,7 @@
       kubeconfig: "{{ kubeconfig_path }}"
       context: "{{ kubecontext }}"
       label_selectors:
-        - run = haproxy-ingress
+        - app.kubernetes.io/name = haproxy-ingress
       field_selectors:
         - status.phase=Running
     register: haproxy_status

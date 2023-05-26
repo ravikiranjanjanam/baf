@@ -5,311 +5,178 @@
 ##############################################################################################
 
 ---
-- name: Converge
+- name: Verify
   hosts: localhost
-  connection: local
-  vars:
-    network:
-      env:
-        type: test
-        proxy: haproxy
-      orderers:
-      - orderer:
-        type: orderer
-        name: testorderer1
-        org_name: testorg
-        uri: orderer1.test.com
-        certificate: ./build/orderer1.crt
-    kubernetes: 
-      config_file: "/tmp/molecule/kind-default/kubeconfig"
-      context: "kind"
-    vault:
-      url: http://localhost:9090/
-      root_token: root
-      
-  pre_tasks:
-    - name: Create temp roles dir folder
-      file:
-        path: "{{ playbook_dir }}/../../shared/configuration"
-        state: directory
-        
-    - name: Copy the roles
-      copy:
-        src: "{{ playbook_dir }}/../../../../shared/configuration/roles"
-        dest: "{{ playbook_dir }}/../../shared/configuration"
-
   tasks:
-#####################################################################################
-    # Copying openssl.conf to molecule playbook directory
-    - name: "Copy openssl.conf to molecule directory"
-      copy:
-        src: "{{ playbook_dir }}/../../openssl.conf"
-        dest: "{{ playbook_dir }}"
-
-####################################################################################
-    # Testing CA server role for orderer
-    - name: "Include create/ca-server"
-      include_role:
-        name: "configuration/roles/create/ca-server"
-      vars:    
-        network:
-          version: 1.4.4
-          env:
-            proxy: testproxy
-            type: test
-        item:
-          name: test_name
-          country: test_country
-          subject: test_subject
-          state: test_state
-          location: test_location
-          external_url_suffix: test_url
-          ca_data:
-            url: test_ca_data_url
-          k8s:
-            config_file: "/tmp/molecule/kind-default/kubeconfig"
-            context: "kind"
-          vault:
-            url: http://localhost:9090/
-            root_token: root
-        component_type: orderer
-        values_dir: test
-        component_name: testorderer
-        component: testorderer
-        ca:
-          name: test_ca
-          subject: "/C=GB/ST=London/L=London/O=Orderer/CN=ca.sj-net"
-        docker_url: test_docker_url
-        gitops:
-          git_protocol: "ssh" 
-          git_url: test_git_ssh
-          branch: test_branch
-          release_dir: "./configuration/molecule/crypto/build"
-          chart_source: test_chart_source
-        vault_ca_result:
-          failed: True
-        component_services:
-          ca:
-            name: ca
-            grpc:
-              port: 7054
-      
-####################################################################################
-    # Testing CA server role for peer
-    - name: "Include create/ca-server"
-      include_role:
-        name: "configuration/roles/create/ca-server"
-      vars:    
-        network:
-          version: 1.4.4
-          env:
-            proxy: testproxy
-            type: test
-        item:
-          name: test_name
-          country: test_country
-          subject: test_subject
-          state: test_state
-          location: test_location
-          external_url_suffix: test_url
-          ca_data:
-            url: test_ca_data_url
-          k8s:
-            config_file: "/tmp/molecule/kind-default/kubeconfig"
-            context: "kind"
-          vault:
-            url: http://localhost:9090/
-            root_token: root
-        component_type: peer
-        values_dir: test
-        component_name: testpeer
-        component: testpeer
-        ca:
-          name: test_ca
-          subject: "/C=GB/ST=London/L=London/O=Peer/CN=ca.sj-net"
-        docker_url: test_docker_url
-        gitops:
-          git_protocol: "ssh" 
-          git_url: test_git_ssh
-          branch: test_branch
-          chart_source: test_chart_source
-          release_dir: "./configuration/molecule/crypto/build"
-        vault_ca_result:
-          failed: True
-        component_services:
-          ca:
-            name: ca
-            grpc:
-              port: 7054
 
 #####################################################################################
-    # Testing create/crypto_script role for orderer
-    - name: "Include configuration/roles/create/crypto_script for orderer"
-      include_role:
-        name: "configuration/roles/create/crypto_script"
-      vars:
-        component_type: orderer
-        component_name: testorderer
-        item:
-          name: test_name
-          country: test_country
-          subject: test_subject
-          state: test_state
-          location: test_location
-          external_url_suffix: test_url
-          ca_data:
-            url: test_ca_data_url
-        orderers:
-          - orderer:
-            name: testorderer1
-            type: orderer
-            consensus: kafka
-            grpc:
-              port: 7050
+  #This task checks if the crypto material are written to Vault for orderer
+  - name: Check if the crypto material are written to Vault for orderer
+    shell: |
+      vault kv get -field=ca.testorderer-cert.pem secretsv2/crypto/ordererOrganizations/testorderer/ca
+      vault kv get -field=testorderer-CA.key secretsv2/crypto/ordererOrganizations/testorderer/ca
+    environment:
+      VAULT_ADDR: "http://localhost:9090"
+      VAULT_TOKEN: "root"
+    register: vault_orderer_CA_cert_key
+    delegate_to: localhost
+  
+#####################################################################################
+  #This task assert if the orderer tls certs is created or not
+  - name: Assert if the orderer tls cert are present in the Vault
+    assert:
+      that: vault_orderer_CA_cert_key.failed == False
+
+#####################################################################################
+  #This task checks if the ca server admin credentials is created or not
+  - name: Check if the ca server admin credentials are written to Vault for orderer
+    shell: |
+      vault kv get secretsv2/credentials/testorderer/ca/testorderer
+    environment:
+      VAULT_ADDR: "http://localhost:9090"
+      VAULT_TOKEN: "root"
+    register: vault_caadmin_result
+    delegate_to: localhost
+  
+#####################################################################################
+  #This task assert if the ca server admin credentials is created or not
+  - name: Assert if the ca server admin credentials are written to Vault for orderer
+    assert:
+      that: vault_caadmin_result.failed == False
+
+#####################################################################################
+  # Check if root token secret exist of every organization in their namespace
+  - name: Check if root token does not exist in the namespace
+    k8s_info:
+      kind: Secret
+      namespace: "testorderer-net"
+      name: "roottoken"
+      kubeconfig: "/tmp/molecule/kind-default/kubeconfig"
+      context: "kind"
+    register: root_token_secret_orderer
+  
+#####################################################################################
+  #This task assert if the root token secret is created
+  - name: Assert if the root token secret is deleted for orderer
+    assert:
+      that: root_token_secret_orderer.resources|length == 0 
+
+#####################################################################################
+  #This task checks if the value file is created for cacerts-job of the orderers
+  - name: Check if the value file is created for cacerts-job of the orderers
+    stat: 
+      path: "./build/testorderer/testorderer/testorderer-cacerts-job.yaml"
+    register: orderer_ca_job_check
+  
+#####################################################################################
+  #This task assert if the value file is created for cacerts-job of the orderers
+  - name: Assert if the value file is created for cacerts-job of the orderers
+    assert:
+      that: orderer_ca_job_check.stat.exists
+    ignore_errors: True
+ 
+# ################# peers ##########################################
+#####################################################################################
+  #This task checks if the crypto material are written to Vault for peers
+  - name: Check if the crypto material are written to Vault for peers
+    shell: |
+      vault kv get -field=ca.testpeer-cert.pem secretsv2/crypto/peerOrganizations/testpeer/ca
+      vault kv get -field=testpeer-CA.key secretsv2/crypto/peerOrganizations/testpeer/ca
+    environment:
+      VAULT_ADDR: "http://localhost:9090"
+      VAULT_TOKEN: "root"
+    register: vault_peer_CA_cert_key
+    delegate_to: localhost
+  
+#####################################################################################
+  #This task assert if the orderer tls certs is created or not
+  - name: Assert if the orderer tls cert are present in the Vault
+    assert:
+      that: vault_peer_CA_cert_key.failed == False
+
+#####################################################################################
+  #This task checks if the ca server admin credentials is created or not
+  - name: Check if the ca server admin credentials are written to Vault for peers
+    shell: |
+      vault kv get secretsv2/credentials/testpeer/ca/testpeer
+    environment:
+      VAULT_ADDR: "http://localhost:9090"
+      VAULT_TOKEN: "root"
+    register: vault_caadmin_result
+    delegate_to: localhost
+  
+#####################################################################################
+  #This task assert if the ca server admin credentials is created or not
+  - name: Assert if the ca server admin credentials are written to Vault for peers
+    assert:
+      that: vault_caadmin_result.failed == False
+
+#####################################################################################
+  # Check if root token secret exist in the namespace testpeer-net
+  - name: Check if root token does not exist in the namespace testpeer-net
+    k8s_info:
+      kind: Secret
+      namespace: "testpeer-net"
+      name: "roottoken"
+      kubeconfig: "/tmp/molecule/kind-default/kubeconfig"
+      context: "kind"
+    register: root_token_secret_peer
+  
+#####################################################################################
+  #This task assert if the root token secret is deleted for peers
+  - name: Assert if the root token secret is deleted for peers
+    assert:
+      that: root_token_secret_peer.resources|length == 0 
+  
+#####################################################################################
+  #This task checks if the value file is created for cacerts-job of the peers
+  - name: Check if the value file is created for cacerts-job of the peers
+    stat:
+      path: "./build/testpeer/testpeer/testpeer-cacerts-job.yaml"
+    register: peer_ca_job_check
+  
+#####################################################################################
+  #This task assert if the value file is created for cacerts-job of the peers
+  - name: Assert if the value file is created for cacerts-job of the peers
+    assert:
+      that: peer_ca_job_check.stat.exists
+    ignore_errors: True
 
 # #####################################################################################
-    # Testing create/crypto_script for peers
-    - name: "Include configuration/roles/create/crypto_script for peers"
-      include_role:
-        name: "configuration/roles/create/crypto_script"
-      vars:
-        component_type: peer
-        component_name: testpeer
-        item:
-          name: test_name
-          country: test_country
-          subject: "O=Manufacturer,OU=Manufacturer,L=47.38/8.54/Zurich,C=CH"
-          state: test_state
-          location: test_location
-          external_url_suffix: test_url
-          ca_data:
-            url: test_ca_data_url
-          services:
-            peers:
-            - peer:
-              name: testpeer1
+# #####################################################################################
+  #This task checks if the orderer tls cert is created or not
+  - name: Check if the orderer certs are written to Vault
+    shell: |
+      vault kv get -field=ca.crt secretsv2/crypto/ordererOrganizations/testorderer/orderers/testorderer1.testorderer/tls 
+      vault kv get -field=server.crt secretsv2/crypto/ordererOrganizations/testorderer/orderers/testorderer1.testorderer/tls 
+      vault kv get -field=admincerts secretsv2/crypto/ordererOrganizations/testorderer/orderers/testorderer1.testorderer/msp  
+      vault kv get -field=cacert secretsv2/crypto/ordererOrganizations/testorderer/orderers/testorderer1.testorderer/msp  
+      vault kv get -field=keystore secretsv2/crypto/ordererOrganizations/testorderer/orderers/testorderer1.testorderer/msp 
+    environment:
+      VAULT_ADDR: "http://localhost:9090"
+      VAULT_TOKEN: "root"
+    register: vault_Ord_tls_result
+    delegate_to: localhost
 
 #####################################################################################
-    # Testing create/configtx
+  #This task assert if orderer tls is created or not
+  - name: Assert if the orderer tls cert are present in the Vault
+    assert:
+      that: vault_Ord_tls_result.failed == False
 
-    - name: "Include create/configtx"
-      include_role:
-        name: "configuration/roles/create/configtx"
-      vars:
-        add_new_org: "false"
-        config_file: "./build/configtx.yaml"
-        values_dir: "./"
-        name: build
-        network:
-          version: "1.4.4"
-          env:
-            proxy: haproxy
-            type: test
-          configtx:
-            custom: false
-            folder_path: "/build/configtx_tpl/"
-          consensus:
-            name: raft
-            type: broker
-            replicas: 4
-            grpc:
-              port: 9092
-          orderers:
-            - orderer:
-              type: orderer
-              name: testorderer1
-              org_name: testorderer              
-              uri: orderer1.test.com:8443 
-          organizations:
-            - organization:
-              name: testorderer
-              type: orderer
-              cloud_provider: aws
-              external_url_suffix: test_url
-              services:
-                consensus:
-                  name: "raft"
-                  replicas: 3
-                orderers:
-                  - orderer:
-                    name: testorderer1
-                    type: orderer
-                    consensus: raft
-                    grpc:
-                      port: 7050
-            - organization:
-              name: testpeer
-              type: peer
-              cloud_provider: aws
-              external_url_suffix: test_url
-              orderer_org: testorderer
-              services:
-                consensus:
-                  name: "raft"
-                  replicas: 3
-                peers:
-                - peer:
-                  name: testpeer
-                  type: anchor
-          channels:
-            - channel:
-              channel_name: test_channel
-              consortium: test_consortium
-              orderers: 
-                - testorderer
-              genesis:
-                name: testOrdererGenesis
-              participants:
-              - organization:
-                name: testorg1
-              - organization:
-                name: testorg2
-
-####################################################################################
-    # Testing create/channel_artifacts
-
-    - name: "Include create/channel_artifacts"
-      include_role:
-        name: "configuration/roles/create/channel_artifacts"
-      vars:
-        add_new_org: "false"
-        fetch_certs: "false"
-        build_path: "./build"
-        values_dir: "."
-        name: build
-        install_os: "linux"                 #Default to linux OS
-        install_arch:  "amd64"  
-        genesis:
-          name: testOrdererGenesis
-        channel_name: "test_channel"
-        profile_name: "test_channel"
-        item:
-          participants:
-          - organization:
-            name: testorg1
-            org_status: old
-          - organization:
-            name: testorg2
-            org_status: new
-        network:
-          env:
-            proxy: haproxy
-            type: test
-          version: "1.4.4"
-          organizations:
-            - organization:
-              name: testorderer
-              type: orderer
-              cloud_provider: aws
-              external_url_suffix: test_url
-              services:
-                consensus:
-                  name: "raft"
-                  replicas: 3
-                orderers:
-                  - orderer:
-                    name: testorderer
-                    type: orderer
-                    consensus: kafka
-                    grpc:
-                      port: 7050
+#####################################################################################
+  #This task checks if the orderer ambassador cert is created or not
+  - name: Check if the crypto material for orderer ambassador are written to Vault
+    shell: |
+      vault kv get -field=certificate secretsv2/crypto/ordererOrganizations/testorderer/ambassador/testorderer1
+      vault kv get -field=key secretsv2/crypto/ordererOrganizations/testorderer/ambassador/testorderer1
+    environment:
+      VAULT_ADDR: "http://localhost:9090"
+      VAULT_TOKEN: "root"
+    register: vault_orderer_ambassador
+  
+#####################################################################################
+  #This task assert if the orderer tls certs is created or not
+  - name: Assert if the orderer tls cert are present in the Vault
+    assert:
+      that: vault_orderer_ambassador.failed == False

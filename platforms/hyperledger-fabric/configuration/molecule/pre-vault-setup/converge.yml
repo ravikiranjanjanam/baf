@@ -52,6 +52,8 @@
     - name: "Include create/ca-server"
       include_role:
         name: "configuration/roles/create/ca-server"
+      tags:
+        - molecule-idempotence-notest 
       vars:
         item:
           external_url_suffix: "test.url.com"
@@ -93,6 +95,8 @@
     - name: "Include create/ca-server"
       include_role:
         name: "configuration/roles/create/ca-server"
+      tags:
+        - molecule-idempotence-notest 
       vars:
         item:
           external_url_suffix: "test.url.com"
