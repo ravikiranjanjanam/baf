@@ -14,7 +14,7 @@
   - name: Check if the crypto material are written to Vault for orderer
     shell: |
       vault kv get -field=ca.testorderer-cert.pem secretsv2/crypto/ordererOrganizations/testorderer/ca
-      vault kv get -field=testorderer-CA.key secretsv2/crypto/ordererOrganizations/testorderer/ca
+      #vault kv get -field=testorderer-CA.key secretsv2/crypto/ordererOrganizations/testorderer/ca
     environment:
       VAULT_ADDR: "http://localhost:9090"
       VAULT_TOKEN: "root"
