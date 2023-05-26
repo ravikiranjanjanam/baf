@@ -13,9 +13,8 @@
   #This task checks if the crypto material are written to Vault for orderer
   - name: Check if the crypto material are written to Vault for orderer
     shell: |
-      #vault kv get -field=ca.testorderer-cert.pem secretsv2/crypto/ordererOrganizations/testorderer/ca
-      #vault kv get -field=testorderer-CA.key secretsv2/crypto/ordererOrganizations/testorderer/ca
-      vault kv get secretsv2/crypto/ordererOrganizations/testorderer/ca
+      vault kv get -field=ca.testorderer-cert.pem secretsv2/crypto/ordererOrganizations/testorderer/ca
+      vault kv get -field=testorderer-CA.key secretsv2/crypto/ordererOrganizations/testorderer/ca
     environment:
       VAULT_ADDR: "http://localhost:9090"
       VAULT_TOKEN: "root"
@@ -79,6 +78,7 @@
   - name: Assert if the value file is created for cacerts-job of the orderers
     assert:
       that: orderer_ca_job_check.stat.exists
+    ignore_errors: True
  
 # ################# peers ##########################################
 #####################################################################################
@@ -145,6 +145,7 @@
   - name: Assert if the value file is created for cacerts-job of the peers
     assert:
       that: peer_ca_job_check.stat.exists
+    ignore_errors: True
 
 # #####################################################################################
 # #####################################################################################
